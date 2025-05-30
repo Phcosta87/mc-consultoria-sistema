@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>05-animations.css - Animações e Transições</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .code-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+        }
+        .code-block {
+            background: #1a1a1a;
+            color: #f8f8f2;
+            font-family: 'Fira Code', monospace;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+        .css-comment { color: #6272a4; }
+        .css-selector { color: #50fa7b; }
+        .css-property { color: #8be9fd; }
+        .css-value { color: #f1fa8c; }
+        .css-keyword { color: #ff79c6; }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="code-container rounded-2xl p-8 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">05-animations.css</h1>
+                    <p class="text-gray-600">Animações e Transições para MC Consultoria</p>
+                </div>
+                <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full text-sm font-semibold">
+                    CSS Animations
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                <p class="text-blue-700">
+                    <strong>Funcionalidade:</strong> Keyframes, transições suaves e animações para uma experiência fluida
+                </p>
+            </div>
+        </div>
+
+        <!-- Código CSS -->
+        <div class="code-container rounded-2xl p-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">Código CSS</h2>
+                <button onclick="copyCode()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                    📋 Copiar
+                </button>
+            </div>
+            
+            <div class="code-block p-6" id="cssCode">
+<pre><span class="css-comment">/* =====================================
+   🎭 ANIMAÇÕES MC CONSULTORIA
+   ===================================== */</span>
+
+<span class="css-comment">/* ✨ KEYFRAMES PRINCIPAIS */</span>
+<span class="css-keyword">@keyframes</span> <span class="css-selector">fadeIn</span> {
+    <span class="css-property">from</span> { 
+        <span class="css-property">opacity</span>: <span class="css-value">0</span>; 
+        <span class="css-property">transform</span>: <span class="css-value">translateY(10px)</span>; 
+    }
+    <span class="css-property">to</span> { 
+        <span class="css-property">opacity</span>: <span class="css-value">1</span>; 
+        <span class="css-property">transform</span>: <span class="css-value">translateY(0)</span>; 
+    }
+}
+
+<span class="css-keyword">@keyframes</span> <span class="css-selector">slideUp</span> {
+    <span class="css-property">from</span> { 
+        <span class="css-property">opacity</span>: <span class="css-value">0</span>; 
+        <span class="css-property">transform</span>: <span class="css-value">translateY(30px)</span>; 
+    }
+    <span class="css-property">to</span> { 
+        <span class="css-property">opacity</span>: <span class="css-value">1</span>; 
+        <span class="css-property">transform</span>: <span class="css-value">translateY(0)</span>; 
+    }
+}
+
+<span class="css-keyword">@keyframes</span> <span class="css-selector">slideInLeft</span> {
+    <span class="css-property">from</span> { 
+        <span class="css-property">opacity</span>: <span class="css-value">0</span>; 
+        <span class="css-property">transform</span>: <span class="css-value">translateX(-50px)</span>; 
+    }
+    <span class="css-property">to</span> { 
+        <span class="css-property">opacity</span>: <span class="css-value">1</span>; 
+        <span class="css-property">transform</span>: <span class="css-value">translateX(0)</span>; 
+    }
+}
+
+<span class="css-keyword">@keyframes</span> <span class="css-selector">slideInRight</span> {
+    <span class="css-property">from</span> { 
+        <span class="css-property">opacity</span>: <span class="css-value">0</span>; 
+        <span class="css-property">transform</span>: <span class="css-value">translateX(50px)</span>; 
+    }
+    <span class="css-property">to</span> { 
+        <span class="css-property">opacity</span>: <span class="css-value">1</span>; 
+        <span class="css-property">transform</span>: <span class="css-value">translateX(0)</span>; 
+    }
+}
+
+<span class="css-keyword">@keyframes</span> <span class="css-selector">pulse</span> {
+    <span class="css-value">0%</span> { <span class="css-property">transform</span>: <span class="css-value">scale(1)</span>; }
+    <span class="css-value">50%</span> { <span class="css-property">transform</span>: <span class="css-value">scale(1.05)</span>; }
+    <span class="css-value">100%</span> { <span class="css-property">transform</span>: <span class="css-value">scale(1)</span>; }
+}
+
+<span class="css-keyword">@keyframes</span> <span class="css-selector">spin</span> {
+    <span class="css-property">to</span> { <span class="css-property">transform</span>: <span class="css-value">rotate(360deg)</span>; }
+}
+
+<span class="css-keyword">@keyframes</span> <span class="css-selector">bounce</span> {
+    <span class="css-value">0%</span>, <span class="css-value">20%</span>, <span class="css-value">53%</span>, <span class="css-value">80%</span>, <span class="css-value">100%</span> { <span class="css-property">transform</span>: <span class="css-value">translateY(0)</span>; }
+    <span class="css-value">40%</span>, <span class="css-value">43%</span> { <span class="css-property">transform</span>: <span class="css-value">translateY(-8px)</span>; }
+    <span class="css-value">70%</span> { <span class="css-property">transform</span>: <span class="css-value">translateY(-4px)</span>; }
+}
+
+<span class="css-keyword">@keyframes</span> <span class="css-selector">shake</span> {
+    <span class="css-value">0%</span>, <span class="css-value">100%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(0)</span>; }
+    <span class="css-value">10%</span>, <span class="css-value">30%</span>, <span class="css-value">50%</span>, <span class="css-value">70%</span>, <span class="css-value">90%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(-4px)</span>; }
+    <span class="css-value">20%</span>, <span class="css-value">40%</span>, <span class="css-value">60%</span>, <span class="css-value">80%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(4px)</span>; }
+}
+
+<span class="css-keyword">@keyframes</span> <span class="css-selector">glow</span> {
+    <span class="css-property">from</span> { <span class="css-property">box-shadow</span>: <span class="css-value">0 0 5px var(--primary-color)</span>; }
+    <span class="css-property">to</span> { <span class="css-property">box-shadow</span>: <span class="css-value">0 0 20px var(--primary-color), 0 0 30px var(--primary-color)</span>; }
+}
+
+<span class="css-comment">/* 🎯 CLASSES DE ANIMAÇÃO */</span>
+<span class="css-selector">.fade-in</span> { 
+    <span class="css-property">animation</span>: <span class="css-value">fadeIn 0.6s ease-in</span>; 
+}
+
+<span class="css-selector">.slide-up</span> { 
+    <span class="css-property">animation</span>: <span class="css-value">slideUp 0.8s ease-out</span>; 
+}
+
+<span class="css-selector">.slide-in-left</span> { 
+    <span class="css-property">animation</span>: <span class="css-value">slideInLeft 0.7s ease-out</span>; 
+}
+
+<span class="css-selector">.slide-in-right</span> { 
+    <span class="css-property">animation</span>: <span class="css-value">slideInRight 0.7s ease-out</span>; 
+}
+
+<span class="css-selector">.pulse</span> { 
+    <span class="css-property">animation</span>: <span class="css-value">pulse 2s infinite</span>; 
+}
+
+<span class="css-selector">.spin</span> { 
+    <span class="css-property">animation</span>: <span class="css-value">spin 1s linear infinite</span>; 
+}
+
+<span class="css-selector">.bounce</span> { 
+    <span class="css-property">animation</span>: <span class="css-value">bounce 1s ease-in-out</span>; 
+}
+
+<span class="css-selector">.shake</span> { 
+    <span class="css-property">animation</span>: <span class="css-value">shake 0.5s ease-in-out</span>; 
+}
+
+<span class="css-selector">.glow</span> { 
+    <span class="css-property">animation</span>: <span class="css-value">glow 1.5s ease-in-out infinite alternate</span>; 
+}
+
+<span class="css-comment">/* ⚡ TRANSIÇÕES SUAVES */</span>
+<span class="css-selector">.smooth-transition</span> {
+    <span class="css-property">transition</span>: <span class="css-value">all 0.3s cubic-bezier(0.4, 0, 0.2, 1)</span>;
+}
+
+<span class="css-selector">.fast-transition</span> {
+    <span class="css-property">transition</span>: <span class="css-value">all 0.15s ease</span>;
+}
+
+<span class="css-selector">.slow-transition</span> {
+    <span class="css-property">transition</span>: <span class="css-value">all 0.6s ease</span>;
+}
+
+<span class="css-comment">/* 🎭 HOVER EFFECTS */</span>
+<span class="css-selector">.hover-lift</span> {
+    <span class="css-property">transition</span>: <span class="css-value">transform 0.3s ease, box-shadow 0.3s ease</span>;
+}
+
+<span class="css-selector">.hover-lift:hover</span> {
+    <span class="css-property">transform</span>: <span class="css-value">translateY(-5px)</span>;
+    <span class="css-property">box-shadow</span>: <span class="css-value">0 15px 35px rgba(0, 0, 0, 0.1)</span>;
+}
+
+<span class="css-selector">.hover-scale</span> {
+    <span class="css-property">transition</span>: <span class="css-value">transform 0.3s ease</span>;
+}
+
+<span class="css-selector">.hover-scale:hover</span> {
+    <span class="css-property">transform</span>: <span class="css-value">scale(1.05)</span>;
+}
+
+<span class="css-selector">.hover-glow</span> {
+    <span class="css-property">transition</span>: <span class="css-value">box-shadow 0.3s ease</span>;
+}
+
+<span class="css-selector">.hover-glow:hover</span> {
+    <span class="css-property">box-shadow</span>: <span class="css-value">0 0 20px var(--primary-color)</span>;
+}
+
+<span class="css-comment">/* 🔄 LOADING ANIMATIONS */</span>
+<span class="css-selector">.loading</span> {
+    <span class="css-property">display</span>: <span class="css-value">inline-block</span>;
+    <span class="css-property">width</span>: <span class="css-value">20px</span>;
+    <span class="css-property">height</span>: <span class="css-value">20px</span>;
+    <span class="css-property">border</span>: <span class="css-value">3px solid rgba(255, 255, 255, 0.3)</span>;
+    <span class="css-property">border-radius</span>: <span class="css-value">50%</span>;
+    <span class="css-property">border-top-color</span>: <span class="css-value">#fff</span>;
+    <span class="css-property">animation</span>: <span class="css-value">spin 1s ease-in-out infinite</span>;
+}
+
+<span class="css-selector">.loading-dots</span> {
+    <span class="css-property">display</span>: <span class="css-value">inline-block</span>;
+    <span class="css-property">position</span>: <span class="css-value">relative</span>;
+    <span class="css-property">width</span>: <span class="css-value">64px</span>;
+    <span class="css-property">height</span>: <span class="css-value">12px</span>;
+}
+
+<span class="css-selector">.loading-dots::before</span>,
+<span class="css-selector">.loading-dots::after</span> {
+    <span class="css-property">content</span>: <span class="css-value">''</span>;
+    <span class="css-property">position</span>: <span class="css-value">absolute</span>;
+    <span class="css-property">top</span>: <span class="css-value">0</span>;
+    <span class="css-property">width</span>: <span class="css-value">12px</span>;
+    <span class="css-property">height</span>: <span class="css-value">12px</span>;
+    <span class="css-property">border-radius</span>: <span class="css-value">50%</span>;
+    <span class="css-property">background</span>: <span class="css-value">var(--primary-color)</span>;
+    <span class="css-property">animation</span>: <span class="css-value">pulse 1.5s ease-in-out infinite</span>;
+}
+
+<span class="css-selector">.loading-dots::before</span> {
+    <span class="css-property">left</span>: <span class="css-value">0</span>;
+    <span class="css-property">animation-delay</span>: <span class="css-value">0s</span>;
+}
+
+<span class="css-selector">.loading-dots::after</span> {
+    <span class="css-property">right</span>: <span class="css-value">0</span>;
+    <span class="css-property">animation-delay</span>: <span class="css-value">0.5s</span>;
+}
+
+<span class="css-comment">/* 📱 ANIMAÇÕES RESPONSIVAS */</span>
+<span class="css-keyword">@media</span> <span class="css-value">(prefers-reduced-motion: reduce)</span> {
+    <span class="css-selector">*</span> {
+        <span class="css-property">animation-duration</span>: <span class="css-value">0.01ms !important</span>;
+        <span class="css-property">animation-iteration-count</span>: <span class="css-value">1 !important</span>;
+        <span class="css-property">transition-duration</span>: <span class="css-value">0.01ms !important</span>;
+    }
+}
+
+<span class="css-keyword">@media</span> <span class="css-value">(max-width: 768px)</span> {
+    <span class="css-selector">.slide-up</span> { 
+        <span class="css-property">animation-duration</span>: <span class="css-value">0.5s</span>; 
+    }
+    
+    <span class="css-selector">.fade-in</span> { 
+        <span class="css-property">animation-duration</span>: <span class="css-value">0.4s</span>; 
+    }
+}
+
+<span class="css-comment">/* 🎨 ANIMAÇÕES DE ENTRADA STAGGERED */</span>
+<span class="css-selector">.stagger-1</span> { <span class="css-property">animation-delay</span>: <span class="css-value">0.1s</span>; }
+<span class="css-selector">.stagger-2</span> { <span class="css-property">animation-delay</span>: <span class="css-value">0.2s</span>; }
+<span class="css-selector">.stagger-3</span> { <span class="css-property">animation-delay</span>: <span class="css-value">0.3s</span>; }
+<span class="css-selector">.stagger-4</span> { <span class="css-property">animation-delay</span>: <span class="css-value">0.4s</span>; }
+<span class="css-selector">.stagger-5</span> { <span class="css-property">animation-delay</span>: <span class="css-value">0.5s</span>; }
+
+<span class="css-comment">/* 🌟 ANIMAÇÕES ESPECIAIS */</span>
+<span class="css-selector">.flip</span> {
+    <span class="css-property">transform-style</span>: <span class="css-value">preserve-3d</span>;
+    <span class="css-property">transition</span>: <span class="css-value">transform 0.6s</span>;
+}
+
+<span class="css-selector">.flip:hover</span> {
+    <span class="css-property">transform</span>: <span class="css-value">rotateY(180deg)</span>;
+}
+
+<span class="css-selector">.zoom-in</span> {
+    <span class="css-property">transform</span>: <span class="css-value">scale(0)</span>;
+    <span class="css-property">animation</span>: <span class="css-value">zoomIn 0.5s ease-out forwards</span>;
+}
+
+<span class="css-keyword">@keyframes</span> <span class="css-selector">zoomIn</span> {
+    <span class="css-property">to</span> { <span class="css-property">transform</span>: <span class="css-value">scale(1)</span>; }
+}
+
+<span class="css-comment">/* 🎯 PERFORMANCE OTIMIZATION */</span>
+<span class="css-selector">.gpu-accelerated</span> {
+    <span class="css-property">transform</span>: <span class="css-value">translateZ(0)</span>;
+    <span class="css-property">will-change</span>: <span class="css-value">transform, opacity</span>;
+}
+
+<span class="css-selector">.smooth-scroll</span> {
+    <span class="css-property">scroll-behavior</span>: <span class="css-value">smooth</span>;
+}</pre>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="code-container rounded-2xl p-8 mt-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">Preview das Animações</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Fade In -->
+                <div class="bg-white p-4 rounded-lg shadow-md fade-in">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full mb-2"></div>
+                    <h3 class="font-semibold">Fade In</h3>
+                    <p class="text-sm text-gray-600">Entrada suave com opacity</p>
+                </div>
+
+                <!-- Slide Up -->
+                <div class="bg-white p-4 rounded-lg shadow-md slide-up">
+                    <div class="w-8 h-8 bg-green-500 rounded-full mb-2"></div>
+                    <h3 class="font-semibold">Slide Up</h3>
+                    <p class="text-sm text-gray-600">Movimento vertical suave</p>
+                </div>
+
+                <!-- Hover Lift -->
+                <div class="bg-white p-4 rounded-lg shadow-md hover-lift cursor-pointer">
+                    <div class="w-8 h-8 bg-purple-500 rounded-full mb-2"></div>
+                    <h3 class="font-semibold">Hover Lift</h3>
+                    <p class="text-sm text-gray-600">Passe o mouse para ver</p>
+                </div>
+
+                <!-- Pulse -->
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <div class="w-8 h-8 bg-red-500 rounded-full mb-2 pulse"></div>
+                    <h3 class="font-semibold">Pulse</h3>
+                    <p class="text-sm text-gray-600">Pulsação contínua</p>
+                </div>
+
+                <!-- Loading -->
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <div class="loading mb-2 mx-auto"></div>
+                    <h3 class="font-semibold">Loading Spinner</h3>
+                    <p class="text-sm text-gray-600">Indicador de carregamento</p>
+                </div>
+
+                <!-- Glow -->
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <div class="w-8 h-8 bg-yellow-500 rounded-full mb-2 glow"></div>
+                    <h3 class="font-semibold">Glow Effect</h3>
+                    <p class="text-sm text-gray-600">Brilho alternado</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Notes -->
+        <div class="code-container rounded-2xl p-8 mt-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">📋 Como Usar</h2>
+            <div class="space-y-4">
+                <div class="bg-green-50 border-l-4 border-green-400 p-4">
+                    <h3 class="font-semibold text-green-800">Classes de Entrada</h3>
+                    <p class="text-green-700">Use <code>.fade-in</code>, <code>.slide-up</code> para animações de entrada</p>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                    <h3 class="font-semibold text-blue-800">Efeitos Hover</h3>
+                    <p class="text-blue-700">Adicione <code>.hover-lift</code>, <code>.hover-scale</code> para interações</p>
+                </div>
+                
+                <div class="bg-purple-50 border-l-4 border-purple-400 p-4">
+                    <h3 class="font-semibold text-purple-800">Loading States</h3>
+                    <p class="text-purple-700">Use <code>.loading</code> ou <code>.spin</code> para indicadores</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyCode() {
+            const codeElement = document.getElementById('cssCode');
+            const text = codeElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(function() {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ Copiado!';
+                button.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('bg-green-600');
+                }, 2000);
+            });
+        }
+
+        // Add some demo interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add stagger animation to preview cards
+            const cards = document.querySelectorAll('.grid .bg-white');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('fade-in');
+            });
+        });
+    </script>
+</body>
+</html>
