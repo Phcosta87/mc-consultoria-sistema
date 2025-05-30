@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filters Panel - MC Consultoria</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+        
+        * { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+        }
+        
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1); 
+        }
+        
+        .checkbox-custom { 
+            appearance: none; 
+            width: 18px; 
+            height: 18px; 
+            border: 2px solid #667eea; 
+            border-radius: 4px; 
+            position: relative; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        
+        .checkbox-custom:checked { 
+            background: var(--primary-gradient); 
+            border-color: #667eea; 
+        }
+        
+        .checkbox-custom:checked::after { 
+            content: '✓'; 
+            position: absolute; 
+            top: -2px; 
+            left: 2px; 
+            color: white; 
+            font-size: 12px; 
+            font-weight: bold; 
+        }
+        
+        .filter-counter {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .filter-group {
+            position: relative;
+        }
+
+        .filter-section-active {
+            border-left: 4px solid #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .btn-primary { 
+            background: var(--primary-gradient); 
+            transition: all 0.3s ease; 
+            transform: translateY(0);
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3); 
+        }
+        
+        .slide-up { 
+            animation: slideUp 0.8s ease-out; 
+        }
+        
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(30px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .hidden { 
+            display: none !important; 
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg">
+        <div class="min-h-screen flex items-center justify-center p-8">
+            <!-- Painel de Filtros Expandido -->
+            <div class="glass-card rounded-2xl p-6 w-full max-w-7xl slide-up">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                        <i data-feather="filter" class="mr-2"></i> Filtros de Pesquisa Avançados
+                        <span id="filtersBadge" class="hidden ml-3 px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">0 ativos</span>
+                    </h2>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="loadPreset('obras')" class="text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                            <i data-feather="hammer" class="w-4 h-4 mr-1"></i>
+                            Preset: Obras
+                        </button>
+                        <button onclick="loadPreset('servicos')" class="text-sm px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
+                            <i data-feather="settings" class="w-4 h-4 mr-1"></i>
+                            Preset: Serviços
+                        </button>
+                        <button onclick="loadPreset('municipais')" class="text-sm px-3 py-1 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors">
+                            <i data-feather="map-pin" class="w-4 h-4 mr-1"></i>
+                            Preset: Municipais
+                        </button>
+                        <button onclick="clearFilters()" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                            <i data-feather="x-circle" class="w-4 h-4 mr-1"></i>
+                            Limpar Filtros
+                        </button>
+                        <button onclick="testarFiltrosCompleto()" class="text-sm px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors">
+                            <i data-feather="activity" class="w-4 h-4 mr-1"></i>
+                            🧪 Testar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Seção Principal de Filtros -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    
+                    <!-- Modalidades -->
+                    <div class="filter-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            <i data-feather="file-text" class="w-4 h-4 inline mr-1"></i>
+                            Modalidades
+                            <span id="modalidadeCounter" class="filter-counter hidden">0</span>
+                        </label>
+                        <div class="space-y-2 max-h-40 overflow-y-auto border rounded-lg p-3 bg-gray-50" id="modalidadesFilter">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="modalidade" value="Concorrência - Eletrônica">
+                                <span class="text-sm">Concorrência - Eletrônica</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="modalidade" value="Concorrência - Presencial">
+                                <span class="text-sm">Concorrência - Presencial</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="modalidade" value="Concurso">
+                                <span class="text-sm">Concurso</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="modalidade" value="Leilão - Eletrônico">
+                                <span class="text-sm">Leilão - Eletrônico</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="modalidade" value="Pregão - Eletrônico">
+                                <span class="text-sm">Pregão - Eletrônico</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="modalidade" value="Pregão - Presencial">
+                                <span class="text-sm">Pregão - Presencial</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Tipologias -->
+                    <div class="filter-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            <i data-feather="layers" class="w-4 h-4 inline mr-1"></i>
+                            Tipologias
+                            <span id="tipologiaCounter" class="filter-counter hidden">0</span>
+                        </label>
+                        <div class="space-y-2 max-h-40 overflow-y-auto border rounded-lg p-3 bg-gray-50" id="tipologiasFilter">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="tipologia" value="Obra/Construção">
+                                <span class="text-sm">Obra/Construção</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="tipologia" value="Reforma Estrutural">
+                                <span class="text-sm">Reforma Estrutural</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="tipologia" value="Manutenção">
+                                <span class="text-sm">Manutenção</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="tipologia" value="Pavimentação">
+                                <span class="text-sm">Pavimentação</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="tipologia" value="Projetos/Serviços de Engenharia">
+                                <span class="text-sm">Projetos/Serviços de Engenharia</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="tipologia" value="Aquisição">
+                                <span class="text-sm">Aquisição</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="tipologia" value="Outros Serviços">
+                                <span class="text-sm">Outros Serviços</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="checkbox-custom" name="tipologia" value="Não Classificado">
+                                <span class="text-sm">Não Classificado</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Datas -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            <i data-feather="calendar" class="w-4 h-4 inline mr-1"></i>
+                            Data de Sessão de Lances
+                        </label>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Início</label>
+                                <input type="date" id="dataInicio" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Fim</label>
+                                <input type="date" id="dataFim" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Valores e Estado -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            <i data-feather="dollar-sign" class="w-4 h-4 inline mr-1"></i>
+                            Valores e Estado
+                        </label>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Valor Mínimo (R$)</label>
+                                <input type="text" id="valorMinimo" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" 
+                                       placeholder="R$ 0,00">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Valor Máximo (R$)</label>
+                                <input type="text" id="valorMaximo" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" 
+                                       placeholder="R$ 0,00">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Estado</label>
+                                <select id="estado" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                                    <option value="">Todos os Estados</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="ES">Espírito Santo</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="GO">Goiás</option>
+                                    <option value="MT">Mato Grosso</option>
+                                    <option value="MS">Mato Grosso do Sul</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🆕 NOVOS FILTROS EXPANDIDOS -->
+                <div class="border-t border-gray-200 pt-6 mb-6">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4 flex items-center">
+                        <i data-feather="plus-circle" class="w-5 h-5 mr-2 text-blue-600"></i>
+                        Filtros Avançados
+                        <span class="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">NOVO</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        
+                        <!-- Município -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                <i data-feather="map-pin" class="w-4 h-4 inline mr-1"></i>
+                                Município
+                            </label>
+                            <input type="text" id="municipio" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" 
+                                   placeholder="Digite o município">
+                        </div>
+
+                        <!-- Modo de Disputa -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                <i data-feather="target" class="w-4 h-4 inline mr-1"></i>
+                                Modo de Disputa
+                            </label>
+                            <select id="modo_disputa" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                                <option value="">Todos os Modos</option>
+                                <option value="Aberto">Aberto</option>
+                                <option value="Fechado">Fechado</option>
+                                <option value="Misto">Misto</option>
+                                <option value="Eletrônico">Eletrônico</option>
+                                <option value="Presencial">Presencial</option>
+                            </select>
+                        </div>
+
+                        <!-- Ano da Compra -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                <i data-feather="calendar" class="w-4 h-4 inline mr-1"></i>
+                                Ano da Compra
+                            </label>
+                            <select id="ano_compra" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                                <option value="">Todos os Anos</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                                <option value="2021">2021</option>
+                                <option value="2020">2020</option>
+                                <option value="2019">2019</option>
+                                <option value="2018">2018</option>
+                            </select>
+                        </div>
+
+                        <!-- Controle PNCP -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                <i data-feather="shield" class="w-4 h-4 inline mr-1"></i>
+                                Controle PNCP
+                            </label>
+                            <input type="text" id="controle_pncp" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" 
+                                   placeholder="Código PNCP">
+                        </div>
+
+                        <!-- Número da Compra do Órgão -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                <i data-feather="hash" class="w-4 h-4 inline mr-1"></i>
+                                Nº Compra Órgão
+                            </label>
+                            <input type="text" id="numero_compra_orgao" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" 
+                                   placeholder="Número da compra">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumo de Filtros Ativos -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i data-feather="info" class="w-5 h-5 text-blue-600 mr-2"></i>
+                            <span class="text-sm font-medium text-blue-800">Resumo dos Filtros:</span>
+                        </div>
+                        <div class="flex items-center space-x-4 text-sm text-blue-700">
+                            <div class="flex items-center">
+                                <span class="font-medium" id="quickModalidades">0</span>
+                                <span class="ml-1">modalidades</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="font-medium" id="quickTipologias">0</span>
+                                <span class="ml-1">tipologias</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="font-medium" id="quickTotal">0</span>
+                                <span class="ml-1">filtros ativos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botão de Pesquisa -->
+                <div class="flex justify-center">
+                    <button onclick="pesquisarLicitacoes()" id="searchBtn" class="px-8 py-3 btn-primary text-white font-medium rounded-xl">
+                        <i data-feather="search" class="w-5 h-5 mr-2"></i>
+                        <span id="searchText">Pesquisar Licitações</span>
+                        <span id="searchLoader" class="loading hidden ml-2"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar ícones
+        feather.replace();
+
+        // Simulação de contadores de filtros
+        function updateFilterCounters() {
+            const modalidades = document.querySelectorAll('input[name="modalidade"]:checked').length;
+            const tipologias = document.querySelectorAll('input[name="tipologia"]:checked').length;
+            const total = modalidades + tipologias;
+
+            // Atualizar contadores individuais
+            const modalidadeCounter = document.getElementById('modalidadeCounter');
+            const tipologiaCounter = document.getElementById('tipologiaCounter');
+
+            if (modalidades > 0) {
+                modalidadeCounter.textContent = modalidades;
+                modalidadeCounter.classList.remove('hidden');
+            } else {
+                modalidadeCounter.classList.add('hidden');
+            }
+
+            if (tipologias > 0) {
+                tipologiaCounter.textContent = tipologias;
+                tipologiaCounter.classList.remove('hidden');
+            } else {
+                tipologiaCounter.classList.add('hidden');
+            }
+
+            // Atualizar resumo
+            document.getElementById('quickModalidades').textContent = modalidades;
+            document.getElementById('quickTipologias').textContent = tipologias;
+            document.getElementById('quickTotal').textContent = total;
+
+            // Atualizar badge geral
+            const filtersBadge = document.getElementById('filtersBadge');
+            if (total > 0) {
+                filtersBadge.textContent = `${total} ativos`;
+                filtersBadge.classList.remove('hidden');
+            } else {
+                filtersBadge.classList.add('hidden');
+            }
+
+            // Atualizar texto do botão
+            const searchText = document.getElementById('searchText');
+            if (total > 0) {
+                searchText.textContent = `Pesquisar (${total} filtros)`;
+            } else {
+                searchText.textContent = 'Pesquisar Licitações';
+            }
+        }
+
+        // Event listeners para checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateFilterCounters);
+        });
+
+        // Funções de preset
+        function loadPreset(preset) {
+            clearFilters();
+            
+            if (preset === 'obras') {
+                const obraCheckboxes = document.querySelectorAll('input[name="tipologia"][value*="Obra"], input[name="tipologia"][value*="Construção"], input[name="tipologia"][value*="Reforma"]');
+                obraCheckboxes.forEach(cb => {
+                    cb.checked = true;
+                });
+                document.getElementById('valorMinimo').value = 'R$ 100.000,00';
+            } else if (preset === 'servicos') {
+                const servicoCheckboxes = document.querySelectorAll('input[name="tipologia"][value*="Serviços"], input[name="tipologia"][value*="Manutenção"]');
+                servicoCheckboxes.forEach(cb => {
+                    cb.checked = true;
+                });
+                document.getElementById('valorMaximo').value = 'R$ 100.000,00';
+            } else if (preset === 'municipais') {
+                document.getElementById('modo_disputa').value = 'Eletrônico';
+                document.getElementById('ano_compra').value = '2024';
+            }
+            
+            updateFilterCounters();
+        }
+
+        function clearFilters() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.getElementById('dataInicio').value = '';
+            document.getElementById('dataFim').value = '';
+            document.getElementById('valorMinimo').value = '';
+            document.getElementById('valorMaximo').value = '';
+            document.getElementById('estado').value = '';
+            document.getElementById('municipio').value = '';
+            document.getElementById('modo_disputa').value = '';
+            document.getElementById('ano_compra').value = '';
+            document.getElementById('controle_pncp').value = '';
+            document.getElementById('numero_compra_orgao').value = '';
+            
+            updateFilterCounters();
+        }
+
+        function testarFiltrosCompleto() {
+            console.log('🧪 Testando filtros completos...');
+            const filtros = {
+                modalidades: Array.from(document.querySelectorAll('input[name="modalidade"]:checked')).map(cb => cb.value),
+                tipologias: Array.from(document.querySelectorAll('input[name="tipologia"]:checked')).map(cb => cb.value),
+                dataInicio: document.getElementById('dataInicio').value,
+                dataFim: document.getElementById('dataFim').value,
+                valorMinimo: document.getElementById('valorMinimo').value,
+                valorMaximo: document.getElementById('valorMaximo').value,
+                estado: document.getElementById('estado').value,
+                municipio: document.getElementById('municipio').value,
+                modo_disputa: document.getElementById('modo_disputa').value,
+                ano_compra: document.getElementById('ano_compra').value,
+                controle_pncp: document.getElementById('controle_pncp').value,
+                numero_compra_orgao: document.getElementById('numero_compra_orgao').value
+            };
+            console.log('Filtros coletados:', filtros);
+            alert('Teste concluído! Verifique o console para detalhes.');
+        }
+
+        function pesquisarLicitacoes() {
+            alert('Pesquisa iniciada! (Função será integrada ao sistema principal)');
+        }
+
+        // Inicializar contadores
+        updateFilterCounters();
+    </script>
+</body>
+</html>
