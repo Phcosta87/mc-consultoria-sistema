@@ -1,358 +1,168 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>02-components.css - Componentes Visuais</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            font-family: 'Fira Code', monospace; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .code-container {
-            background: rgba(0, 0, 0, 0.95);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .code-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 600;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .css-code {
-            color: #00ff88;
-            font-size: 14px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            overflow-x: auto;
-        }
-        .comment { color: #888; }
-        .selector { color: #ff6b6b; }
-        .property { color: #4ecdc4; }
-        .value { color: #ffe66d; }
-        .file-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <div class="code-container">
-        <div class="code-header">
-            📁 assets/css/02-components.css
-        </div>
-        
-        <div class="file-info">
-            <h3 class="text-lg font-bold mb-2">🎨 Componentes Visuais</h3>
-            <p class="text-sm opacity-90">
-                <strong>Funcionalidades:</strong> Botões com gradientes, cards glass, inputs focáveis, checkboxes customizados, loaders animados
-            </p>
-            <p class="text-sm opacity-75 mt-1">
-                <strong>Dependências:</strong> 01-base.css (variáveis CSS)
-            </p>
-        </div>
+/* =====================================
+   🧩 COMPONENTES VISUAIS
+   MC Consultoria - Sistema de Licitações
+   ===================================== */
 
-        <div class="css-code">
-<span class="comment">/* =====================================
-   🎨 COMPONENTES VISUAIS MC CONSULTORIA
-   ===================================== */</span>
-
-<span class="comment">/* 🔘 BOTÕES COM GRADIENTES */</span>
-<span class="selector">.btn-primary</span> {
-    <span class="property">background:</span> <span class="value">var(--primary-gradient)</span>;
-    <span class="property">color:</span> <span class="value">white</span>;
-    <span class="property">border:</span> <span class="value">none</span>;
-    <span class="property">border-radius:</span> <span class="value">12px</span>;
-    <span class="property">padding:</span> <span class="value">12px 24px</span>;
-    <span class="property">font-weight:</span> <span class="value">500</span>;
-    <span class="property">font-size:</span> <span class="value">14px</span>;
-    <span class="property">cursor:</span> <span class="value">pointer</span>;
-    <span class="property">transition:</span> <span class="value">all 0.3s ease</span>;
-    <span class="property">transform:</span> <span class="value">translateY(0)</span>;
-    <span class="property">min-height:</span> <span class="value">48px</span>;
-    <span class="property">display:</span> <span class="value">inline-flex</span>;
-    <span class="property">align-items:</span> <span class="value">center</span>;
-    <span class="property">justify-content:</span> <span class="value">center</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 4px 15px rgba(102, 126, 234, 0.3)</span>;
+/* Botões */
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    transform: translateY(0);
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-<span class="selector">.btn-primary:hover</span> {
-    <span class="property">transform:</span> <span class="value">translateY(-2px)</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 8px 25px rgba(102, 126, 234, 0.4)</span>;
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
 }
 
-<span class="selector">.btn-primary:active</span> {
-    <span class="property">transform:</span> <span class="value">translateY(0)</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 4px 15px rgba(102, 126, 234, 0.3)</span>;
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
-<span class="selector">.btn-primary:disabled</span> {
-    <span class="property">opacity:</span> <span class="value">0.6</span>;
-    <span class="property">cursor:</span> <span class="value">not-allowed</span>;
-    <span class="property">transform:</span> <span class="value">translateY(0)</span>;
+.btn-secondary {
+    background: var(--secondary-gradient);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-<span class="selector">.btn-secondary</span> {
-    <span class="property">background:</span> <span class="value">var(--secondary-gradient)</span>;
-    <span class="property">color:</span> <span class="value">white</span>;
-    <span class="property">border:</span> <span class="value">none</span>;
-    <span class="property">border-radius:</span> <span class="value">12px</span>;
-    <span class="property">padding:</span> <span class="value">12px 24px</span>;
-    <span class="property">font-weight:</span> <span class="value">500</span>;
-    <span class="property">cursor:</span> <span class="value">pointer</span>;
-    <span class="property">transition:</span> <span class="value">all 0.3s ease</span>;
-    <span class="property">transform:</span> <span class="value">translateY(0)</span>;
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(245, 87, 108, 0.3);
 }
 
-<span class="selector">.btn-secondary:hover</span> {
-    <span class="property">transform:</span> <span class="value">translateY(-2px)</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 8px 25px rgba(245, 87, 108, 0.4)</span>;
+/* Cards Estatísticos */
+.stat-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    transition: all var(--transition-normal);
+    height: 120px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-<span class="comment">/* 🪟 CARDS GLASS EFFECT */</span>
-<span class="selector">.glass-card</span> {
-    <span class="property">background:</span> <span class="value">rgba(255, 255, 255, 0.95)</span>;
-    <span class="property">backdrop-filter:</span> <span class="value">blur(20px)</span>;
-    <span class="property">-webkit-backdrop-filter:</span> <span class="value">blur(20px)</span>;
-    <span class="property">border:</span> <span class="value">1px solid rgba(255, 255, 255, 0.2)</span>;
-    <span class="property">border-radius:</span> <span class="value">20px</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 25px 50px rgba(0, 0, 0, 0.1)</span>;
-    <span class="property">transition:</span> <span class="value">all 0.3s ease</span>;
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
 }
 
-<span class="selector">.glass-dark</span> {
-    <span class="property">background:</span> <span class="value">rgba(0, 0, 0, 0.1)</span>;
-    <span class="property">backdrop-filter:</span> <span class="value">blur(10px)</span>;
-    <span class="property">-webkit-backdrop-filter:</span> <span class="value">blur(10px)</span>;
-    <span class="property">border:</span> <span class="value">1px solid rgba(255, 255, 255, 0.1)</span>;
-    <span class="property">border-radius:</span> <span class="value">15px</span>;
+/* Checkboxes Customizados */
+.checkbox-custom {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background-color: white;
 }
 
-<span class="selector">.stat-card</span> {
-    <span class="property">background:</span> <span class="value">rgba(255, 255, 255, 0.9)</span>;
-    <span class="property">backdrop-filter:</span> <span class="value">blur(20px)</span>;
-    <span class="property">border:</span> <span class="value">1px solid rgba(255, 255, 255, 0.3)</span>;
-    <span class="property">border-radius:</span> <span class="value">16px</span>;
-    <span class="property">padding:</span> <span class="value">24px</span>;
-    <span class="property">transition:</span> <span class="value">all 0.3s ease</span>;
-    <span class="property">height:</span> <span class="value">120px</span>;
-    <span class="property">display:</span> <span class="value">flex</span>;
-    <span class="property">flex-direction:</span> <span class="value">column</span>;
-    <span class="property">justify-content:</span> <span class="value">center</span>;
+.checkbox-custom:checked {
+    background: var(--primary-gradient);
+    border-color: var(--primary-color);
 }
 
-<span class="selector">.stat-card:hover</span> {
-    <span class="property">transform:</span> <span class="value">translateY(-5px)</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 20px 40px rgba(0, 0, 0, 0.15)</span>;
+.checkbox-custom:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -2px;
+    left: 2px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
 }
 
-<span class="comment">/* 📝 INPUTS ESTILIZADOS */</span>
-<span class="selector">.input-styled</span> {
-    <span class="property">width:</span> <span class="value">100%</span>;
-    <span class="property">padding:</span> <span class="value">12px 16px</span>;
-    <span class="property">border:</span> <span class="value">2px solid rgba(255, 255, 255, 0.2)</span>;
-    <span class="property">border-radius:</span> <span class="value">12px</span>;
-    <span class="property">background:</span> <span class="value">rgba(255, 255, 255, 0.9)</span>;
-    <span class="property">backdrop-filter:</span> <span class="value">blur(10px)</span>;
-    <span class="property">font-size:</span> <span class="value">14px</span>;
-    <span class="property">transition:</span> <span class="value">all 0.3s ease</span>;
-    <span class="property">outline:</span> <span class="value">none</span>;
+/* Loading Spinner */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
 }
 
-<span class="selector">.input-styled:focus</span> {
-    <span class="property">border-color:</span> <span class="value">var(--primary-color)</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 0 0 3px rgba(102, 126, 234, 0.1)</span>;
-    <span class="property">background:</span> <span class="value">rgba(255, 255, 255, 1)</span>;
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
-<span class="selector">.input-styled::placeholder</span> {
-    <span class="property">color:</span> <span class="value">rgba(0, 0, 0, 0.5)</span>;
-    <span class="property">font-size:</span> <span class="value">13px</span>;
+/* Table Styles */
+.table-row {
+    transition: all var(--transition-fast);
 }
 
-<span class="comment">/* ✅ CHECKBOXES CUSTOMIZADOS */</span>
-<span class="selector">.checkbox-custom</span> {
-    <span class="property">appearance:</span> <span class="value">none</span>;
-    <span class="property">-webkit-appearance:</span> <span class="value">none</span>;
-    <span class="property">width:</span> <span class="value">18px</span>;
-    <span class="property">height:</span> <span class="value">18px</span>;
-    <span class="property">border:</span> <span class="value">2px solid var(--primary-color)</span>;
-    <span class="property">border-radius:</span> <span class="value">4px</span>;
-    <span class="property">position:</span> <span class="value">relative</span>;
-    <span class="property">cursor:</span> <span class="value">pointer</span>;
-    <span class="property">transition:</span> <span class="value">all 0.3s ease</span>;
-    <span class="property">background:</span> <span class="value">white</span>;
+.table-row:hover {
+    background: rgba(102, 126, 234, 0.05);
+    transform: scale(1.01);
 }
 
-<span class="selector">.checkbox-custom:checked</span> {
-    <span class="property">background:</span> <span class="value">var(--primary-gradient)</span>;
-    <span class="property">border-color:</span> <span class="value">var(--primary-color)</span>;
-    <span class="property">transform:</span> <span class="value">scale(1.05)</span>;
+.sort-header {
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    user-select: none;
 }
 
-<span class="selector">.checkbox-custom:checked::after</span> {
-    <span class="property">content:</span> <span class="value">'✓'</span>;
-    <span class="property">position:</span> <span class="value">absolute</span>;
-    <span class="property">top:</span> <span class="value">-2px</span>;
-    <span class="property">left:</span> <span class="value">2px</span>;
-    <span class="property">color:</span> <span class="value">white</span>;
-    <span class="property">font-size:</span> <span class="value">12px</span>;
-    <span class="property">font-weight:</span> <span class="value">bold</span>;
-    <span class="property">line-height:</span> <span class="value">1</span>;
+.sort-header:hover {
+    background: rgba(102, 126, 234, 0.1);
 }
 
-<span class="selector">.checkbox-custom:hover</span> {
-    <span class="property">border-color:</span> <span class="value">var(--secondary-color)</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 0 10px rgba(102, 126, 234, 0.3)</span>;
+/* Pagination */
+.pagination-btn {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    color: #374151;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.875rem;
 }
 
-<span class="comment">/* 🔄 LOADING ANIMATIONS */</span>
-<span class="selector">.loading</span> {
-    <span class="property">display:</span> <span class="value">inline-block</span>;
-    <span class="property">width:</span> <span class="value">20px</span>;
-    <span class="property">height:</span> <span class="value">20px</span>;
-    <span class="property">border:</span> <span class="value">3px solid rgba(255, 255, 255, 0.3)</span>;
-    <span class="property">border-radius:</span> <span class="value">50%</span>;
-    <span class="property">border-top-color:</span> <span class="value">#fff</span>;
-    <span class="property">animation:</span> <span class="value">spin 1s ease-in-out infinite</span>;
+.pagination-btn:hover {
+    background-color: #f9fafb;
+    border-color: var(--primary-color);
 }
 
-<span class="selector">.loading-large</span> {
-    <span class="property">width:</span> <span class="value">40px</span>;
-    <span class="property">height:</span> <span class="value">40px</span>;
-    <span class="property">border-width:</span> <span class="value">4px</span>;
+.pagination-btn:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
-<span class="selector">.loading-primary</span> {
-    <span class="property">border:</span> <span class="value">3px solid rgba(102, 126, 234, 0.3)</span>;
-    <span class="property">border-top-color:</span> <span class="value">var(--primary-color)</span>;
+/* Logo Text */
+.logo-text {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
 }
-
-<span class="comment">/* 🎯 BADGES E INDICATORS */</span>
-<span class="selector">.filter-counter</span> {
-    <span class="property">position:</span> <span class="value">absolute</span>;
-    <span class="property">top:</span> <span class="value">-8px</span>;
-    <span class="property">right:</span> <span class="value">-8px</span>;
-    <span class="property">background:</span> <span class="value">var(--danger-gradient)</span>;
-    <span class="property">color:</span> <span class="value">white</span>;
-    <span class="property">border-radius:</span> <span class="value">50%</span>;
-    <span class="property">width:</span> <span class="value">20px</span>;
-    <span class="property">height:</span> <span class="value">20px</span>;
-    <span class="property">font-size:</span> <span class="value">11px</span>;
-    <span class="property">display:</span> <span class="value">flex</span>;
-    <span class="property">align-items:</span> <span class="value">center</span>;
-    <span class="property">justify-content:</span> <span class="value">center</span>;
-    <span class="property">font-weight:</span> <span class="value">bold</span>;
-    <span class="property">animation:</span> <span class="value">pulse 2s infinite</span>;
-}
-
-<span class="selector">.status-badge</span> {
-    <span class="property">padding:</span> <span class="value">4px 12px</span>;
-    <span class="property">border-radius:</span> <span class="value">20px</span>;
-    <span class="property">font-size:</span> <span class="value">12px</span>;
-    <span class="property">font-weight:</span> <span class="value">500</span>;
-    <span class="property">text-transform:</span> <span class="value">uppercase</span>;
-    <span class="property">letter-spacing:</span> <span class="value">0.5px</span>;
-}
-
-<span class="selector">.status-online</span> {
-    <span class="property">background:</span> <span class="value">var(--success-gradient)</span>;
-    <span class="property">color:</span> <span class="value">white</span>;
-}
-
-<span class="selector">.status-offline</span> {
-    <span class="property">background:</span> <span class="value">var(--danger-gradient)</span>;
-    <span class="property">color:</span> <span class="value">white</span>;
-}
-
-<span class="comment">/* 📊 TABLE COMPONENTS */</span>
-<span class="selector">.table-row</span> {
-    <span class="property">transition:</span> <span class="value">all 0.2s ease</span>;
-    <span class="property">cursor:</span> <span class="value">pointer</span>;
-}
-
-<span class="selector">.table-row:hover</span> {
-    <span class="property">background:</span> <span class="value">rgba(102, 126, 234, 0.05)</span>;
-    <span class="property">transform:</span> <span class="value">scale(1.01)</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 2px 10px rgba(0, 0, 0, 0.1)</span>;
-}
-
-<span class="selector">.sort-header</span> {
-    <span class="property">cursor:</span> <span class="value">pointer</span>;
-    <span class="property">transition:</span> <span class="value">all 0.2s ease</span>;
-    <span class="property">user-select:</span> <span class="value">none</span>;
-}
-
-<span class="selector">.sort-header:hover</span> {
-    <span class="property">background:</span> <span class="value">rgba(102, 126, 234, 0.1)</span>;
-    <span class="property">border-radius:</span> <span class="value">8px</span>;
-}
-
-<span class="comment">/* 🎨 PAGINATION COMPONENTS */</span>
-<span class="selector">.pagination-btn</span> {
-    <span class="property">padding:</span> <span class="value">8px 16px</span>;
-    <span class="property">border:</span> <span class="value">1px solid rgba(255, 255, 255, 0.2)</span>;
-    <span class="property">border-radius:</span> <span class="value">8px</span>;
-    <span class="property">background:</span> <span class="value">rgba(255, 255, 255, 0.9)</span>;
-    <span class="property">color:</span> <span class="value">var(--text-color)</span>;
-    <span class="property">cursor:</span> <span class="value">pointer</span>;
-    <span class="property">transition:</span> <span class="value">all 0.2s ease</span>;
-    <span class="property">font-size:</span> <span class="value">14px</span>;
-}
-
-<span class="selector">.pagination-btn:hover:not(:disabled)</span> {
-    <span class="property">background:</span> <span class="value">var(--primary-gradient)</span>;
-    <span class="property">color:</span> <span class="value">white</span>;
-    <span class="property">transform:</span> <span class="value">translateY(-1px)</span>;
-}
-
-<span class="selector">.pagination-btn:disabled</span> {
-    <span class="property">background-color:</span> <span class="value">rgba(200, 200, 200, 0.5)</span>;
-    <span class="property">cursor:</span> <span class="value">not-allowed</span>;
-    <span class="property">opacity:</span> <span class="value">0.6</span>;
-    <span class="property">color:</span> <span class="value">rgba(0, 0, 0, 0.4)</span>;
-}
-
-<span class="comment">/* 🔍 SEARCH COMPONENTS */</span>
-<span class="selector">.search-input</span> {
-    <span class="property">background:</span> <span class="value">rgba(255, 255, 255, 0.9)</span>;
-    <span class="property">border:</span> <span class="value">2px solid transparent</span>;
-    <span class="property">border-radius:</span> <span class="value">25px</span>;
-    <span class="property">padding:</span> <span class="value">12px 20px 12px 45px</span>;
-    <span class="property">font-size:</span> <span class="value">14px</span>;
-    <span class="property">transition:</span> <span class="value">all 0.3s ease</span>;
-    <span class="property">outline:</span> <span class="value">none</span>;
-    <span class="property">position:</span> <span class="value">relative</span>;
-}
-
-<span class="selector">.search-input:focus</span> {
-    <span class="property">border-color:</span> <span class="value">var(--primary-color)</span>;
-    <span class="property">background:</span> <span class="value">white</span>;
-    <span class="property">box-shadow:</span> <span class="value">0 0 20px rgba(102, 126, 234, 0.2)</span>;
-}
-
-<span class="selector">.search-icon</span> {
-    <span class="property">position:</span> <span class="value">absolute</span>;
-    <span class="property">left:</span> <span class="value">15px</span>;
-    <span class="property">top:</span> <span class="value">50%</span>;
-    <span class="property">transform:</span> <span class="value">translateY(-50%)</span>;
-    <span class="property">color:</span> <span class="value">rgba(0, 0, 0, 0.5)</span>;
-    <span class="property">pointer-events:</span> <span class="value">none</span>;
-}
-        </div>
-    </div>
-</body>
-</html>
