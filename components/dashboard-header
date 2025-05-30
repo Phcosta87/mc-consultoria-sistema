@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Header - MC Consultoria</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .glass-dark { 
+            background: rgba(0, 0, 0, 0.1); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        .logo-text { 
+            font-family: 'Poppins', sans-serif; 
+            font-weight: 700; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text; 
+        }
+        .status-online {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            animation: pulse-green 2s infinite;
+        }
+        .status-offline {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: pulse-red 2s infinite;
+        }
+        .gradient-bg { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        }
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard Header Component -->
+    <header class="glass-dark border-b border-white border-opacity-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo e Branding -->
+                <div class="flex items-center space-x-4">
+                    <!-- Logo Container -->
+                    <div class="w-12 h-12 rounded-full glass-dark flex items-center justify-center hover-lift">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    
+                    <!-- Nome e Status -->
+                    <div class="flex flex-col">
+                        <h1 class="text-2xl font-bold text-white logo-text">MC Consultoria</h1>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <div id="systemStatusIndicator" class="w-2 h-2 rounded-full status-online"></div>
+                            <span id="systemStatusText" class="text-sm text-gray-300">Sistema Online</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações e Controles -->
+                <div class="flex items-center space-x-6">
+                    <!-- Informações do Sistema -->
+                    <div class="hidden md:flex flex-col items-end text-sm text-gray-300">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-1">
+                                <i data-feather="clock" class="w-4 h-4"></i>
+                                <span id="lastUpdate">Última atualização: --:--</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i data-feather="users" class="w-4 h-4"></i>
+                                <span id="activeUsers">Usuário: Admin</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 mt-1">
+                            <div class="flex items-center space-x-1">
+                                <i data-feather="server" class="w-4 h-4"></i>
+                                <span id="serverStatus">Servidor: MC Shop</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i data-feather="database" class="w-4 h-4"></i>
+                                <span id="dbStatus">DB: Conectado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controles de Usuário -->
+                    <div class="flex items-center space-x-3">
+                        <!-- Notificações -->
+                        <button class="relative p-2 text-white hover:text-gray-300 transition-colors hover-lift" id="notificationsBtn">
+                            <i data-feather="bell" class="w-5 h-5"></i>
+                            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                        </button>
+
+                        <!-- Configurações -->
+                        <button class="p-2 text-white hover:text-gray-300 transition-colors hover-lift" id="settingsBtn">
+                            <i data-feather="settings" class="w-5 h-5"></i>
+                        </button>
+
+                        <!-- Separador -->
+                        <div class="w-px h-6 bg-white bg-opacity-20"></div>
+
+                        <!-- Logout -->
+                        <button onclick="logout()" class="flex items-center space-x-2 px-4 py-2 text-white hover:text-gray-300 transition-colors hover-lift rounded-lg hover:bg-white hover:bg-opacity-10" id="logoutBtn">
+                            <i data-feather="log-out" class="w-5 h-5"></i>
+                            <span class="hidden sm:inline">Sair</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Status Modal (Opcional) -->
+    <div id="statusModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-6 m-4 max-w-md w-full">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">Status do Sistema</h3>
+                <button onclick="closeStatusModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-feather="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span>API Principal</span>
+                    <span class="text-green-600 font-medium">✓ Online</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Banco de Dados</span>
+                    <span class="text-green-600 font-medium">✓ Conectado</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>N8N Webhooks</span>
+                    <span class="text-green-600 font-medium">✓ Ativo</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Última Sincronização</span>
+                    <span class="text-gray-600" id="lastSync">Agora mesmo</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar ícones Feather
+        feather.replace();
+
+        // Função de logout (será conectada ao sistema principal)
+        function logout() {
+            if (typeof Auth !== 'undefined' && Auth.logout) {
+                Auth.logout();
+            } else {
+                // Fallback caso o sistema principal não esteja carregado
+                console.log('Logout iniciado');
+                alert('Logout realizado com sucesso!');
+            }
+        }
+
+        // Atualizar último update
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pt-BR');
+            document.getElementById('lastUpdate').textContent = `Última atualização: ${timeString}`;
+        }
+
+        // Atualizar status do sistema
+        function updateSystemStatus(isOnline = true) {
+            const indicator = document.getElementById('systemStatusIndicator');
+            const text = document.getElementById('systemStatusText');
+            
+            if (isOnline) {
+                indicator.className = 'w-2 h-2 rounded-full status-online';
+                text.textContent = 'Sistema Online';
+            } else {
+                indicator.className = 'w-2 h-2 rounded-full status-offline';
+                text.textContent = 'Sistema Offline';
+            }
+        }
+
+        // Modal de status
+        function openStatusModal() {
+            document.getElementById('statusModal').classList.remove('hidden');
+        }
+
+        function closeStatusModal() {
+            document.getElementById('statusModal').classList.add('hidden');
+        }
+
+        // Event listeners
+        document.getElementById('systemStatusIndicator').addEventListener('click', openStatusModal);
+        document.getElementById('systemStatusText').addEventListener('click', openStatusModal);
+
+        // Atualizar timestamp a cada minuto
+        setInterval(updateLastUpdate, 60000);
+        updateLastUpdate();
+
+        // Simular verificação de status a cada 30 segundos
+        setInterval(() => {
+            // Aqui você pode implementar uma verificação real de status
+            updateSystemStatus(true);
+        }, 30000);
+
+        console.log('🏠 Dashboard Header Component carregado com sucesso');
+    </script>
+</body>
+</html>
