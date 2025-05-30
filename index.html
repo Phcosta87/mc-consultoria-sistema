@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC Consultoria - Sistema de Licitações (Modular)</title>
+    
+    <!-- External Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Modular CSS -->
+    <link rel="stylesheet" href="assets/css/01-base.css">
+    <link rel="stylesheet" href="assets/css/02-components.css">
+    <link rel="stylesheet" href="assets/css/03-glassmorphism.css">
+    <link rel="stylesheet" href="assets/css/04-debug-performance.css">
+    <link rel="stylesheet" href="assets/css/05-animations.css">
+</head>
+<body>
+    <!-- Debug Controls -->
+    <button class="debug-toggle" onclick="toggleDebug()">
+        <i data-feather="monitor"></i> Debug Filtros
+    </button>
+    
+    <div id="debugPanel" class="debug-panel hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong>🔍 Debug Console - MC Consultoria</strong>
+            <div>
+                <button onclick="testarFiltrosCompleto()" style="background: #0066cc; color: #fff; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; margin-right: 5px;">Testar</button>
+                <button onclick="clearDebugLog()" style="background: #333; color: #fff; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer;">Clear</button>
+            </div>
+        </div>
+        <div id="debugLog"></div>
+    </div>
+    
+    <div id="performanceBadge" class="performance-badge performance-good hidden">
+        ⚡ Performance: Ótima
+    </div>
+
+    <div class="gradient-bg">
+        <!-- Login Screen Component -->
+        <div id="loginScreen" class="min-h-screen flex items-center justify-center px-4">
+            <div class="glass-card rounded-3xl p-8 w-full max-w-md slide-up">
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full glass-dark mb-4">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-3xl font-bold logo-text mb-2">MC Consultoria</h1>
+                    <p class="text-gray-600">Sistema de Licitações</p>
+                </div>
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Usuário</label>
+                        <input type="text" id="username" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Digite seu usuário" value="admin">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                        <input type="password" id="password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Digite sua senha" value="123456">
+                    </div>
+                    <button type="submit" id="loginBtn" class="w-full py-3 px-6 btn-primary text-white font-medium rounded-xl">
+                        <span id="loginText">Entrar</span>
+                        <span id="loginLoader" class="loading hidden ml-2"></span>
+                    </button>
+                </form>
+                <div id="loginError" class="hidden mt-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-xl text-sm"></div>
+                <div id="loginSuccess" class="hidden mt-4 p-3 bg-green-100 border border-green-300 text-green-700 rounded-xl text-sm"></div>
+                
+                <div class="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-blue-700">Status da Conexão:</span>
+                        <span id="connectionStatus" class="text-sm font-medium text-blue-900">Verificando...</span>
+                    </div>
+                    <div class="mt-2 bg-gray-200 rounded-full h-2">
+                        <div id="connectionProgress" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="mainDashboard" class="hidden min-h-screen">
+            <!-- Header Component -->
+            <header class="glass-dark border-b border-white border-opacity-20">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center py-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full glass-dark flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h1 class="text-2xl font-bold text-white">MC Consultoria</h1>
+                            <span id="systemStatus" class="px-3 py-1 bg-green-500 text-white text-xs rounded-full">Online</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-white text-sm">
+                                <span id="lastUpdate">Última atualização: --:--</span>
+                            </div>
+                            <button onclick="logout()" class="text-white hover:text-gray-300 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Quick Stats Header -->
+                <div class="glass-card rounded-2xl p-4 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800">Painel de Controle</h2>
+                            <p class="text-sm text-gray-600">Sistema modular MC Consultoria</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-blue-600" id="quickTotal">0</div>
+                                <div class="text-xs text-gray-500">Total</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-green-600" id="quickValue">R$ 0</div>
+                                <div class="text-xs text-gray-500">Valor</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-purple-600" id="queryTime">0ms</div>
+                                <div class="text-xs text-gray-500">Consulta</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-orange-600" id="activeFilters">0</div>
+                                <div class="text-xs text-gray-500">Filtros</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters Panel Component -->
+                <div id="filtersPanel" class="glass-card rounded-2xl p-6 mb-8 slide-up">
+                    <!-- Conteúdo será carregado via JavaScript -->
+                </div>
+
+                <!-- Statistics Cards Component -->
+                <div id="statsSection" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Conteúdo será carregado via JavaScript -->
+                </div>
+
+                <!-- Charts Section Component -->
+                <div id="chartsSection" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="chart-container">
+                        <h3 class="text-lg font-semibold mb-4">Distribuição por Modalidade</h3>
+                        <canvas id="modalidadeChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="text-lg font-semibold mb-4">Distribuição por Tipologia</h3>
+                        <canvas id="tipologiaChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Results Table Component -->
+                <div id="resultsSection" class="hidden glass-card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800">Resultados da Pesquisa</h2>
+                        <div class="flex items-center space-x-4">
+                            <span id="resultsCount" class="text-sm text-gray-600">0 resultados</span>
+                            <div class="flex space-x-2">
+                                <button onclick="exportResults('csv')" class="btn-secondary text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-1">
+                                    <i data-feather="download" class="w-4 h-4"></i>
+                                    <span>CSV</span>
+                                </button>
+                                <button onclick="exportResults('excel')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-1">
+                                    <i data-feather="file-spreadsheet" class="w-4 h-4"></i>
+                                    <span>Excel</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-sm text-gray-600">
+                            <span class="font-medium">25 resultados por página</span> • 
+                            Tempo de consulta: <span id="queryTimeDetail" class="font-medium">--</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="quickSearch" placeholder="Busca rápida..." class="px-3 py-2 border border-gray-200 rounded-lg text-sm w-48" onkeyup="quickTableSearch(this.value)">
+                            <button onclick="refreshResults()" class="px-3 py-2 bg-gray-500 text-white rounded-lg text-sm">
+                                <i data-feather="refresh-cw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="sort-header px-4 py-3 text-left text-sm font-medium text-gray-700" onclick="sortTable('modalidade')">
+                                        Modalidade <i data-feather="chevron-down" class="inline ml-1 w-4 h-4"></i>
+                                    </th>
+                                    <th class="sort-header px-4 py-3 text-left text-sm font-medium text-gray-700" onclick="sortTable('comprador')">
+                                        Comprador <i data-feather="chevron-down" class="inline ml-1 w-4 h-4"></i>
+                                    </th>
+                                    <th class="sort-header px-4 py-3 text-left text-sm font-medium text-gray-700" onclick="sortTable('objeto')">
+                                        Objeto <i data-feather="chevron-down" class="inline ml-1 w-4 h-4"></i>
+                                    </th>
+                                    <th class="sort-header px-4 py-3 text-left text-sm font-medium text-gray-700" onclick="sortTable('valor')">
+                                        Valor <i data-feather="chevron-down" class="inline ml-1 w-4 h-4"></i>
+                                    </th>
+                                    <th class="sort-header px-4 py-3 text-left text-sm font-medium text-gray-700" onclick="sortTable('abertura')">
+                                        Abertura <i data-feather="chevron-down" class="inline ml-1 w-4 h-4"></i>
+                                    </th>
+                                    <th class="sort-header px-4 py-3 text-left text-sm font-medium text-gray-700" onclick="sortTable('tipologia_oficial')">
+                                        Tipologia <i data-feather="chevron-down" class="inline ml-1 w-4 h-4"></i>
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Link</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                                <tr><td colspan="7" class="text-center py-10 text-gray-500">Nenhum resultado encontrado ou busca não realizada.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="paginationSection" class="hidden flex items-center justify-between mt-6">
+                        <div class="text-sm text-gray-600">
+                            Mostrando <span id="showingFrom">0</span> a <span id="showingTo">0</span> de <span id="totalResults">0</span> resultados
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="firstPage()" id="firstPageBtn" class="pagination-btn px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                ⏮️ Primeira
+                            </button>
+                            <button onclick="previousPage()" id="prevPageBtn" class="pagination-btn px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                ⬅️ Anterior
+                            </button>
+                            <span id="pageNumbers" class="flex space-x-1"></span>
+                            <button onclick="nextPage()" id="nextPageBtn" class="pagination-btn px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Próxima ➡️
+                            </button>
+                            <button onclick="lastPage()" id="lastPageBtn" class="pagination-btn px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Última ⏭️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modular JavaScript -->
+    <script src="assets/js/01-config.js"></script>
+    <script src="assets/js/02-debug.js"></script>
+    <script src="assets/js/03-performance.js"></script>
+    <script src="assets/js/04-ui-manager.js"></script>
+    <script src="assets/js/05-auth.js"></script>
+    <script src="assets/js/06-filter-manager.js"></script>
+    <script src="assets/js/07-search-engine.js"></script>
+    <script src="assets/js/08-charts.js"></script>
+    <script src="assets/js/09-pagination.js"></script>
+    <script src="assets/js/10-main.js"></script>
+</body>
+</html>
