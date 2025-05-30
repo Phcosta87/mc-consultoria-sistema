@@ -165,47 +165,52 @@ const App = {
     },
     
     // Verificar conexão com N8N
-    async checkConnection() {
-        Debug.log('🔌 Verificando conexão com N8N...', 'info');
+async checkConnection() {
+    Debug.log('🔌 Verificando conexão com N8N...', 'info');
+    
+    const statusEl = document.getElementById('connectionStatus');
+    const progressEl = document.getElementById('connectionProgress');
+    
+    try {
+        if (statusEl) statusEl.textContent = 'Testando conexão...';
+        if (progressEl) progressEl.style.width = '30%';
         
-        const statusEl = document.getElementById('connectionStatus');
-        const progressEl = document.getElementById('connectionProgress');
+        Performance.start('Connection Test');
         
-        try {
-            if (statusEl) statusEl.textContent = 'Testando conexão...';
-            if (progressEl) progressEl.style.width = '30%';
-            
-            Performance.start('Connection Test');
-            
-            const response = await fetch(CONFIG.ENDPOINTS.LOGIN, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ test: true }),
-                signal: AbortSignal.timeout(5000)
-            });
-            
-            Performance.end('Connection Test');
-            if (progressEl) progressEl.style.width = '100%';
-            
-            if (response.ok || response.status === 400) {
-                if (statusEl) {
-                    statusEl.textContent = '✅ Conectado';
-                    statusEl.className = 'text-sm font-medium text-green-700';
-                }
-                Debug.log('✅ Conexão com N8N estabelecida', 'success');
-            } else {
-                throw new Error(`Status: ${response.status}`);
-            }
-            
-        } catch (error) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(CONFIG.ENDPOINTS.LOGIN, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ test: true }),
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        Performance.end('Connection Test');
+        if (progressEl) progressEl.style.width = '100%';
+        
+        if (response.ok || response.status === 400) {
             if (statusEl) {
-                statusEl.textContent = '❌ Erro de Conexão';
-                statusEl.className = 'text-sm font-medium text-red-700';
+                statusEl.textContent = '✅ Conectado';
+                statusEl.className = 'text-sm font-medium text-green-700';
             }
-            if (progressEl) progressEl.style.width = '0%';
-            Debug.log(`❌ Erro de conexão: ${error.message}`, 'error');
+            Debug.log('✅ Conexão com N8N estabelecida', 'success');
+        } else {
+            throw new Error(`Status: ${response.status}`);
         }
-    },
+        
+    } catch (error) {
+        if (statusEl) {
+            statusEl.textContent = '❌ Erro de Conexão';
+            statusEl.className = 'text-sm font-medium text-red-700';
+        }
+        if (progressEl) progressEl.style.width = '0%';
+        Debug.log(`❌ Erro de conexão: ${error.message}`, 'error');
+    }
+},
+
     
     // Tentar auto-login
     tryAutoLogin() {
