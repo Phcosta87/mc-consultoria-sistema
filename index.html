@@ -14,25 +14,42 @@
     <!-- Configurações MC Consultoria - Inline -->
     <script>
         // Configurações MC Consultoria
-        window.CONFIG = {
-            ENDPOINTS: {
-                FRONTEND: 'https://n8n.mcconsultoria.shop/webhook/produto1',
-                LOGIN: 'https://n8n.mcconsultoria.shop/webhook/loginproduto1',
-                CONSULTA: 'https://n8n.mcconsultoria.shop/webhook/consultaproduto1',
-                EXPORT: 'https://n8n.mcconsultoria.shop/webhook/exportproduto1'
-            },
-            PAGINATION: {
-                ITEMS_PER_PAGE: 25,
-                MAX_VISIBLE_PAGES: 5
-            },
-            TIMEOUTS: {
-                LOGIN: 15000,
-                SEARCH: 30000,
-                EXPORT: 60000
-            },
-            DEBUG: true,
-            PERFORMANCE_TRACKING: true
-        };
+       window.CONFIG = {
+    ENDPOINTS: {
+        FRONTEND: 'https://n8n.mcconsultoria.shop/webhook/produto1',
+        LOGIN: 'https://n8n.mcconsultoria.shop/webhook/loginproduto1',
+        CONSULTA: 'https://n8n.mcconsultoria.shop/webhook/consultaproduto1',
+        EXPORT: 'https://n8n.mcconsultoria.shop/webhook/exportproduto1'
+    },
+    PAGINATION: {
+        ITEMS_PER_PAGE: 25,
+        MAX_VISIBLE_PAGES: 5
+    },
+    TIMEOUTS: {
+        LOGIN: 15000,
+        SEARCH: 30000,
+        EXPORT: 60000
+    },
+    // Configurações de UI que estavam faltando
+    UI: {
+        ERROR_MESSAGE_DURATION: 5000,
+        SUCCESS_MESSAGE_DURATION: 3000,
+        NOTIFICATION_DURATION: 4000,
+        ANIMATION_SPEED: 300,
+        TOAST_DURATION: 3000
+    },
+    // Configurações de Performance
+    PERFORMANCE: {
+        GOOD_THRESHOLD: 1000,
+        WARNING_THRESHOLD: 3000,
+        ERROR_THRESHOLD: 5000
+    },
+    DEBUG: true,
+    PERFORMANCE_TRACKING: true,
+    GOOD_THRESHOLD: 1000,
+    WARNING_THRESHOLD: 3000,
+    ERROR_THRESHOLD: 5000
+};
         console.log('✅ CONFIG: Configurações carregadas inline');
     </script>
     
