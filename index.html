@@ -313,7 +313,7 @@
         </div>
     </div>
 
-    <!-- Modular JavaScript (removido o 01-config.js já que está inline) -->
+  <!-- Modular JavaScript -->
     <script src="assets/js/02-debug.js"></script>
     <script src="assets/js/03-performance.js"></script>
     <script src="assets/js/04-ui-manager.js"></script>
@@ -323,5 +323,37 @@
     <script src="assets/js/08-charts.js"></script>
     <script src="assets/js/09-pagination.js"></script>
     <script src="assets/js/10-main.js"></script>
+
+    <!-- Script de Inicialização Aprimorado -->
+    <script>
+    // Forçar inicialização correta
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            if (typeof App !== 'undefined' && !AppState.isInitialized) {
+                console.log('🔄 Reinicializando sistema...');
+                App.init();
+            }
+        }, 1000);
+    });
+
+    // Prevenir múltiplas inicializações no F5
+    let initializationInProgress = false;
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!initializationInProgress) {
+            initializationInProgress = true;
+            console.log('🚀 Iniciando sistema pela primeira vez...');
+        }
+    });
+
+    // Garantir que FilterManager seja inicializado
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            if (typeof FilterManager !== 'undefined' && typeof FilterManager.init === 'function') {
+                FilterManager.init();
+                console.log('✅ FilterManager inicializado');
+            }
+        }, 500);
+    });
+    </script>
 </body>
 </html>
