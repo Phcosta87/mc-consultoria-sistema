@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Configurações MC Consultoria - Inline -->
+    <!-- Configurações MC Consultoria - Completa -->
     <script>
         // Configurações MC Consultoria
         window.CONFIG = {
@@ -31,7 +31,11 @@
                 EXPORT: 60000
             },
             DEBUG: true,
-            PERFORMANCE_TRACKING: true
+            PERFORMANCE_TRACKING: true,
+            // Thresholds que estavam faltando
+            GOOD_THRESHOLD: 1000,
+            WARNING_THRESHOLD: 3000,
+            ERROR_THRESHOLD: 5000
         };
         console.log('✅ CONFIG: Configurações carregadas inline');
     </script>
@@ -44,28 +48,6 @@
     <link rel="stylesheet" href="assets/css/05-animations.css">
 </head>
 <body>
-    <body>
-<script>
-    // Script de emergência
-    if (!window.CONFIG || !window.CONFIG.GOOD_THRESHOLD) {
-        window.CONFIG = {
-            ENDPOINTS: {
-                FRONTEND: 'https://n8n.mcconsultoria.shop/webhook/produto1',
-                LOGIN: 'https://n8n.mcconsultoria.shop/webhook/loginproduto1',
-                CONSULTA: 'https://n8n.mcconsultoria.shop/webhook/consultaproduto1',
-                EXPORT: 'https://n8n.mcconsultoria.shop/webhook/exportproduto1'
-            },
-            PAGINATION: { ITEMS_PER_PAGE: 25, MAX_VISIBLE_PAGES: 5 },
-            TIMEOUTS: { LOGIN: 15000, SEARCH: 30000, EXPORT: 60000 },
-            DEBUG: true,
-            PERFORMANCE_TRACKING: true,
-            GOOD_THRESHOLD: 1000,
-            WARNING_THRESHOLD: 3000,
-            ERROR_THRESHOLD: 5000
-        };
-        console.log('🚨 CONFIG: Configurações de emergência carregadas');
-    }
-</script>
     <!-- Debug Controls -->
     <button class="debug-toggle" onclick="toggleDebug()">
         <i data-feather="monitor"></i> Debug Filtros
@@ -220,7 +202,7 @@
                                     <span>CSV</span>
                                 </button>
                                 <button onclick="exportResults('excel')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-1">
-                                    <i data-feather="file-spreadsheet" class="w-4 h-4"></i>
+                                    <i data-feather="file-text" class="w-4 h-4"></i>
                                     <span>Excel</span>
                                 </button>
                             </div>
@@ -296,7 +278,7 @@
         </div>
     </div>
 
-    <!-- Modular JavaScript (removido o 01-config.js já que está inline) -->
+    <!-- Modular JavaScript -->
     <script src="assets/js/02-debug.js"></script>
     <script src="assets/js/03-performance.js"></script>
     <script src="assets/js/04-ui-manager.js"></script>
@@ -306,5 +288,52 @@
     <script src="assets/js/08-charts.js"></script>
     <script src="assets/js/09-pagination.js"></script>
     <script src="assets/js/10-main.js"></script>
+
+    <!-- Script de Inicialização -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar Feather Icons
+        if (typeof feather !== 'undefined') {
+            try {
+                feather.replace();
+                console.log('✅ FEATHER: Ícones carregados com sucesso');
+            } catch (error) {
+                console.error('❌ FEATHER: Erro ao carregar ícones', error);
+            }
+        }
+        
+        // Inicializar sistema de performance
+        if (window.CONFIG && window.CONFIG.PERFORMANCE_TRACKING) {
+            try {
+                console.log('🚀 PERFORMANCE: Iniciando sistema de monitoramento');
+                const startTime = performance.now();
+                
+                setTimeout(() => {
+                    const endTime = performance.now();
+                    const duration = endTime - startTime;
+                    console.log(`✅ APP: Inicialização concluída em ${duration.toFixed(2)}ms`);
+                }, 100);
+                
+            } catch (error) {
+                console.error('❌ PERFORMANCE: Erro na inicialização', error);
+            }
+        }
+        
+        // Verificar status do servidor
+        if (window.CONFIG && window.CONFIG.ENDPOINTS) {
+            fetch(window.CONFIG.ENDPOINTS.FRONTEND)
+                .then(response => {
+                    if (response.ok) {
+                        console.log('✅ SERVER: Servidor respondendo');
+                    } else {
+                        console.warn('⚠️ SERVER: Servidor com problemas');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ SERVER: Erro de conexão', error);
+                });
+        }
+    });
+    </script>
 </body>
 </html>
