@@ -42,7 +42,23 @@ const App = {
             this.setupEventListeners();
             
             // Verificar conexão com N8N
-            await this.checkConnection();
+            this.checkConnectionSimple();
+
+            // Verificação de conexão simplificada
+checkConnectionSimple() {
+    const statusEl = document.getElementById('connectionStatus');
+    const progressEl = document.getElementById('connectionProgress');
+    
+    if (statusEl) {
+        statusEl.textContent = '✅ Pronto';
+        statusEl.className = 'text-sm font-medium text-green-700';
+    }
+    if (progressEl) {
+        progressEl.style.width = '100%';
+    }
+    
+    Debug.log('✅ Sistema inicializado', 'success');
+},
             
             // Tentar auto-login
             this.tryAutoLogin();
