@@ -7,7 +7,7 @@
 const AppState = {
     currentPage: 1,
     totalItems: 0,
-    pageSize: 25, // Usando valor padrão
+    pageSize: 25,
     currentSort: { column: 'abertura', order: 'desc' },
     searchInProgress: false,
     lastSearchTime: 0,
@@ -21,7 +21,8 @@ const AppState = {
         modalidade: null,
         tipologia: null
     },
-    isInitialized: false
+    isInitialized: false,
+    connectionStatus: 'unknown' // unknown, connected, error, timeout
 };
 
 // Sistema de inicialização
@@ -47,10 +48,10 @@ const App = {
             // Configurar event listeners
             this.setupEventListeners();
             
-            // Verificar conexão com N8N
-            await this.checkConnection();
+            // Verificar conexão com N8N (modo não-bloqueante)
+            this.checkConnectionAsync();
             
-            // Tentar auto-login (usando seu sistema Auth)
+            // Tentar auto-login
             this.tryAutoLogin();
             
             // Finalizar inicialização
@@ -116,14 +117,11 @@ const App = {
     setupEventListeners() {
         Debug.log('🔗 Configurando event listeners globais...', 'info');
         
-        // Form de login (já tratado pelo seu Auth através do handleLogin global)
+        // Form de login
         const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            // Verificar se já não tem listener
-            if (!loginForm.hasAttribute('data-listener-added')) {
-                loginForm.addEventListener('submit', window.handleLogin);
-                loginForm.setAttribute('data-listener-added', 'true');
-            }
+        if (loginForm && !loginForm.hasAttribute('data-listener-added')) {
+            loginForm.addEventListener('submit', window.handleLogin);
+            loginForm.setAttribute('data-listener-added', 'true');
         }
         
         // Teclas de atalho globais
@@ -141,6 +139,9 @@ const App = {
     // Configurar teclas de atalho globais
     setupGlobalKeyboardShortcuts() {
         document.addEventListener('keydown', (event) => {
+            // Verificar se Auth existe antes de usar
+            if (typeof Auth === 'undefined') return;
+            
             // Ctrl + Enter para pesquisar
             if (event.ctrlKey && event.key === 'Enter') {
                 event.preventDefault();
@@ -169,12 +170,14 @@ const App = {
     
     // Monitoramento de conexão
     setupConnectionMonitoring() {
-        // Online/Offline events
         window.addEventListener('online', () => {
             if (typeof UI !== 'undefined' && typeof UI.updateSystemStatus === 'function') {
                 UI.updateSystemStatus('Online', 'Conexão restaurada');
             }
             Debug.log('🌐 Conexão restaurada', 'success');
+            
+            // Tentar reconectar
+            this.checkConnectionAsync();
         });
         
         window.addEventListener('offline', () => {
@@ -198,6 +201,16 @@ const App = {
         });
     },
     
+    // Verificar conexão com N8N (modo assíncrono)
+    checkConnectionAsync() {
+        // Executar verificação em background sem bloquear inicialização
+        setTimeout(() => {
+            this.checkConnection().catch(error => {
+                Debug.log(`Verificação de conexão falhou: ${error.message}`, 'warning');
+            });
+        }, 1000);
+    },
+    
     // Verificar conexão com N8N
     async checkConnection() {
         Debug.log('🔌 Verificando conexão com N8N...', 'info');
@@ -209,12 +222,12 @@ const App = {
             if (statusEl) statusEl.textContent = 'Verificando...';
             if (progressEl) progressEl.style.width = '25%';
             
-            // Usar endpoint de teste ou frontend
+            // Usar endpoint de frontend com timeout aumentado
             const testUrl = CONFIG.ENDPOINTS.FRONTEND;
             
-            // Testar conexão com timeout
+            // Timeout aumentado para 20 segundos
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            const timeoutId = setTimeout(() => controller.abort(), 20000);
             
             if (progressEl) progressEl.style.width = '50%';
             
@@ -225,7 +238,8 @@ const App = {
                 },
                 body: JSON.stringify({
                     action: 'test-connection',
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    source: 'mc-consultoria-frontend'
                 }),
                 signal: controller.signal
             });
@@ -233,7 +247,9 @@ const App = {
             clearTimeout(timeoutId);
             if (progressEl) progressEl.style.width = '75%';
             
+            // Verificar resposta
             if (response.ok) {
+                AppState.connectionStatus = 'connected';
                 if (statusEl) {
                     statusEl.textContent = '✅ Conectado';
                     statusEl.className = 'text-sm font-medium text-green-700';
@@ -246,19 +262,26 @@ const App = {
             }
             
         } catch (error) {
+            AppState.connectionStatus = error.name === 'AbortError' ? 'timeout' : 'error';
+            
             if (statusEl) {
-                statusEl.textContent = '❌ Erro de Conexão';
-                statusEl.className = 'text-sm font-medium text-red-700';
+                if (error.name === 'AbortError') {
+                    statusEl.textContent = '⏱️ Timeout';
+                    statusEl.className = 'text-sm font-medium text-yellow-700';
+                } else {
+                    statusEl.textContent = '❌ Erro';
+                    statusEl.className = 'text-sm font-medium text-red-700';
+                }
             }
             if (progressEl) progressEl.style.width = '0%';
             
             if (error.name === 'AbortError') {
-                Debug.log('⏱️ Timeout na conexão com N8N', 'warning');
+                Debug.log('⏱️ Timeout na conexão com N8N (20s)', 'warning');
             } else {
                 Debug.log(`❌ Erro na conexão com N8N: ${error.message}`, 'error');
             }
             
-            // Tentar modo offline/fallback
+            // Ativar modo offline
             this.enableOfflineMode();
             return false;
         }
@@ -266,22 +289,31 @@ const App = {
     
     // Modo offline/fallback
     enableOfflineMode() {
+        AppState.connectionStatus = 'offline';
         Debug.log('📴 Ativando modo offline', 'warning');
+        
         const statusEl = document.getElementById('connectionStatus');
         if (statusEl) {
             statusEl.textContent = '📴 Modo Offline';
             statusEl.className = 'text-sm font-medium text-yellow-700';
         }
+        
+        // Ainda permitir login em modo offline para teste
+        Debug.log('ℹ️ Sistema funcionará em modo offline limitado', 'info');
     },
     
-    // Tentar auto-login usando seu sistema Auth
+    // Tentar auto-login
     tryAutoLogin() {
         if (typeof Auth !== 'undefined' && typeof Auth.autoLogin === 'function') {
-            const autoLoginSuccess = Auth.autoLogin();
-            if (autoLoginSuccess) {
-                Debug.log('🔐 Auto-login realizado com sucesso', 'success');
-            } else {
-                Debug.log('🔐 Auto-login não disponível', 'info');
+            try {
+                const autoLoginSuccess = Auth.autoLogin();
+                if (autoLoginSuccess) {
+                    Debug.log('🔐 Auto-login realizado com sucesso', 'success');
+                } else {
+                    Debug.log('🔐 Auto-login não disponível', 'info');
+                }
+            } catch (error) {
+                Debug.log(`⚠️ Erro no auto-login: ${error.message}`, 'warning');
             }
         }
     },
@@ -302,6 +334,7 @@ const App = {
         Debug.log('🎉 MC Consultoria Sistema inicializado com sucesso!', 'success', {
             tempo: `${duration.toFixed(2)}ms`,
             versao: '2.0.0',
+            conexao: AppState.connectionStatus,
             modulos: {
                 config: typeof CONFIG !== 'undefined',
                 debug: typeof Debug !== 'undefined',
@@ -345,9 +378,14 @@ const App = {
                     <h2 class="text-xl font-bold text-gray-800 mb-2">Erro de Inicialização</h2>
                     <p class="text-gray-600 mb-4">Houve um problema ao carregar o sistema.</p>
                     <p class="text-sm text-gray-500 mb-6">${error.message}</p>
-                    <button onclick="location.reload()" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
-                        Recarregar Página
-                    </button>
+                    <div class="space-y-2">
+                        <button onclick="location.reload()" class="w-full bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                            Recarregar Página
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" class="w-full bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            Continuar Mesmo Assim
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -416,11 +454,20 @@ function sortTable(column) {
     }
 }
 
-// Exportar resultados
+// Exportar resultados com verificação de conexão
 async function exportResults(format = 'csv') {
-    // Verificar autenticação usando seu sistema
-    if (!Auth.isLoggedIn()) {
+    // Verificar autenticação
+    if (typeof Auth === 'undefined' || !Auth.isLoggedIn()) {
         Debug.warning('Tentativa de exportação sem autenticação');
+        return;
+    }
+    
+    // Verificar conexão
+    if (AppState.connectionStatus !== 'connected') {
+        Debug.warning('Tentativa de exportação sem conexão ativa');
+        if (typeof UI !== 'undefined' && typeof UI.showError === 'function') {
+            UI.showError('exportError', 'Não é possível exportar sem conexão com o servidor');
+        }
         return;
     }
     
@@ -443,7 +490,11 @@ async function exportResults(format = 'csv') {
 
 // Refresh dos resultados
 function refreshResults() {
-    // Verificar autenticação
+    if (typeof Auth === 'undefined') {
+        Debug.warning('Auth não disponível');
+        return;
+    }
+    
     Auth.requireAuth(() => {
         Debug.log('🔄 Atualizando resultados...', 'info');
         if (typeof pesquisarLicitacoes !== 'undefined') {
@@ -468,6 +519,11 @@ function quickTableSearch(searchTerm) {
 
 // Limpar filtros
 function clearFilters() {
+    if (typeof Auth === 'undefined') {
+        Debug.warning('Auth não disponível');
+        return;
+    }
+    
     Auth.requireAuth(() => {
         if (typeof FilterManager !== 'undefined' && typeof FilterManager.clearAllFilters === 'function') {
             FilterManager.clearAllFilters();
@@ -476,39 +532,47 @@ function clearFilters() {
     });
 }
 
-// Funções de paginação
+// Funções de paginação com verificação de Auth
 function firstPage() {
-    Auth.requireAuth(() => {
-        if (typeof pesquisarLicitacoes !== 'undefined') {
-            pesquisarLicitacoes(1);
-        }
-    });
+    if (typeof Auth !== 'undefined') {
+        Auth.requireAuth(() => {
+            if (typeof pesquisarLicitacoes !== 'undefined') {
+                pesquisarLicitacoes(1);
+            }
+        });
+    }
 }
 
 function previousPage() {
-    Auth.requireAuth(() => {
-        if (AppState.currentPage > 1 && typeof pesquisarLicitacoes !== 'undefined') {
-            pesquisarLicitacoes(AppState.currentPage - 1);
-        }
-    });
+    if (typeof Auth !== 'undefined') {
+        Auth.requireAuth(() => {
+            if (AppState.currentPage > 1 && typeof pesquisarLicitacoes !== 'undefined') {
+                pesquisarLicitacoes(AppState.currentPage - 1);
+            }
+        });
+    }
 }
 
 function nextPage() {
-    Auth.requireAuth(() => {
-        const maxPage = Math.ceil(AppState.totalItems / AppState.pageSize);
-        if (AppState.currentPage < maxPage && typeof pesquisarLicitacoes !== 'undefined') {
-            pesquisarLicitacoes(AppState.currentPage + 1);
-        }
-    });
+    if (typeof Auth !== 'undefined') {
+        Auth.requireAuth(() => {
+            const maxPage = Math.ceil(AppState.totalItems / AppState.pageSize);
+            if (AppState.currentPage < maxPage && typeof pesquisarLicitacoes !== 'undefined') {
+                pesquisarLicitacoes(AppState.currentPage + 1);
+            }
+        });
+    }
 }
 
 function lastPage() {
-    Auth.requireAuth(() => {
-        const maxPage = Math.ceil(AppState.totalItems / AppState.pageSize);
-        if (typeof pesquisarLicitacoes !== 'undefined') {
-            pesquisarLicitacoes(maxPage);
-        }
-    });
+    if (typeof Auth !== 'undefined') {
+        Auth.requireAuth(() => {
+            const maxPage = Math.ceil(AppState.totalItems / AppState.pageSize);
+            if (typeof pesquisarLicitacoes !== 'undefined') {
+                pesquisarLicitacoes(maxPage);
+            }
+        });
+    }
 }
 
 // =====================================
@@ -532,7 +596,7 @@ function checkDependencies() {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Aguardar um pouco para garantir que todos os scripts carregaram
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         // Verificar dependências
         if (!checkDependencies()) {
@@ -546,17 +610,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('❌ Erro crítico na inicialização:', error);
         
         // Fallback para erro crítico
-        document.body.innerHTML = `
+        const errorHtml = `
             <div class="min-h-screen bg-red-50 flex items-center justify-center">
                 <div class="text-center p-8">
                     <h1 class="text-2xl font-bold text-red-600 mb-4">Erro Crítico</h1>
                     <p class="text-red-500 mb-4">${error.message}</p>
-                    <button onclick="location.reload()" class="bg-red-600 text-white px-6 py-2 rounded">
-                        Recarregar
-                    </button>
+                    <div class="space-y-2">
+                        <button onclick="location.reload()" class="bg-red-600 text-white px-6 py-2 rounded">
+                            Recarregar
+                        </button>
+                        <button onclick="document.body.innerHTML = originalBodyContent" class="bg-gray-600 text-white px-6 py-2 rounded">
+                            Tentar Continuar
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
+        
+        // Salvar conteúdo original
+        window.originalBodyContent = document.body.innerHTML;
+        document.body.innerHTML = errorHtml;
     }
 });
 
