@@ -94,25 +94,26 @@ const Performance = {
         
         let className, text, emoji;
         
-        if (duration < CONFIG.PERFORMANCE.GOOD_THRESHOLD) {
-            className = 'performance-good';
-            text = `Ótima (${duration.toFixed(0)}ms)`;
-            emoji = '⚡';
-        } else if (duration < CONFIG.PERFORMANCE.MEDIUM_THRESHOLD) {
-            className = 'performance-medium';
-            text = `Média (${(duration/1000).toFixed(1)}s)`;
-            emoji = '⚠️';
-        } else {
-            className = 'performance-bad';
-            text = `Lenta (${(duration/1000).toFixed(1)}s)`;
-            emoji = '🐌';
-        }
+       // SUBSTITUA POR ESTA VERSÃO CORRIGIDA:
+if (duration < CONFIG.GOOD_THRESHOLD) {
+    className = 'performance-good';
+    text = `Ótima (${duration.toFixed(0)}ms)`;
+    emoji = '⚡';
+} else if (duration < CONFIG.WARNING_THRESHOLD) {
+    className = 'performance-medium';
+    text = `Média (${(duration/1000).toFixed(1)}s)`;
+    emoji = '⚠️';
+} else {
+    className = 'performance-bad';
+    text = `Lenta (${(duration/1000).toFixed(1)}s)`;
+    emoji = '🐌';
+}
         
         badge.className = `performance-badge ${className}`;
         badge.textContent = `${emoji} Performance: ${text}`;
         
         // Auto-hide após 5 segundos se performance boa
-        if (duration < CONFIG.PERFORMANCE.GOOD_THRESHOLD) {
+        if (duration < CONFIG.GOOD_THRESHOLD) {
             setTimeout(() => {
                 if (badge.classList.contains('performance-good')) {
                     badge.classList.add('hidden');
@@ -129,13 +130,13 @@ const Performance = {
             
             // Adicionar classe de cor baseada na performance
             queryTimeEl.className = '';
-            if (duration < CONFIG.PERFORMANCE.GOOD_THRESHOLD) {
-                queryTimeEl.classList.add('text-green-600');
-            } else if (duration < CONFIG.PERFORMANCE.MEDIUM_THRESHOLD) {
-                queryTimeEl.classList.add('text-yellow-600');
-            } else {
-                queryTimeEl.classList.add('text-red-600');
-            }
+            if (duration < CONFIG.GOOD_THRESHOLD) {
+    queryTimeEl.classList.add('text-green-600');
+} else if (duration < CONFIG.WARNING_THRESHOLD) {
+    queryTimeEl.classList.add('text-yellow-600');
+} else {
+    queryTimeEl.classList.add('text-red-600');
+}
         }
         
         // Atualizar tempo detalhado se disponível
