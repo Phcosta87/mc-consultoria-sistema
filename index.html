@@ -11,6 +11,31 @@
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- Configurações MC Consultoria - Inline -->
+    <script>
+        // Configurações MC Consultoria
+        window.CONFIG = {
+            ENDPOINTS: {
+                FRONTEND: 'https://n8n.mcconsultoria.shop/webhook/produto1',
+                LOGIN: 'https://n8n.mcconsultoria.shop/webhook/loginproduto1',
+                CONSULTA: 'https://n8n.mcconsultoria.shop/webhook/consultaproduto1',
+                EXPORT: 'https://n8n.mcconsultoria.shop/webhook/exportproduto1'
+            },
+            PAGINATION: {
+                ITEMS_PER_PAGE: 25,
+                MAX_VISIBLE_PAGES: 5
+            },
+            TIMEOUTS: {
+                LOGIN: 15000,
+                SEARCH: 30000,
+                EXPORT: 60000
+            },
+            DEBUG: true,
+            PERFORMANCE_TRACKING: true
+        };
+        console.log('✅ CONFIG: Configurações carregadas inline');
+    </script>
+    
     <!-- Modular CSS -->
     <link rel="stylesheet" href="assets/css/01-base.css">
     <link rel="stylesheet" href="assets/css/02-components.css">
@@ -249,8 +274,7 @@
         </div>
     </div>
 
-    <!-- Modular JavaScript -->
-    <script src="assets/js/01-config.js"></script>
+    <!-- Modular JavaScript (removido o 01-config.js já que está inline) -->
     <script src="assets/js/02-debug.js"></script>
     <script src="assets/js/03-performance.js"></script>
     <script src="assets/js/04-ui-manager.js"></script>
