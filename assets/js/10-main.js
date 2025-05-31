@@ -7,7 +7,7 @@
 const AppState = {
     currentPage: 1,
     totalItems: 0,
-    pageSize: CONFIG.PAGINATION.ITEMS_PER_PAGE,
+    pageSize: 25, // Usando valor padrão
     currentSort: { column: 'abertura', order: 'desc' },
     searchInProgress: false,
     lastSearchTime: 0,
@@ -28,12 +28,18 @@ const AppState = {
 const App = {
     // Inicializar aplicação
     async init() {
-        Performance.start('App Initialization');
+        if (typeof Performance !== 'undefined') {
+            Performance.start('App Initialization');
+        }
+        
         Debug.log('🚀 Inicializando MC Consultoria Sistema de Licitações...', 'info');
         
         try {
             // Aguardar carregamento do DOM
             await this.waitForDOM();
+            
+            // Verificar CONFIG
+            this.validateConfig();
             
             // Inicializar módulos na ordem correta
             this.initializeModules();
@@ -42,25 +48,9 @@ const App = {
             this.setupEventListeners();
             
             // Verificar conexão com N8N
-            this.checkConnectionSimple();
-
-            // Verificação de conexão simplificada
-checkConnectionSimple() {
-    const statusEl = document.getElementById('connectionStatus');
-    const progressEl = document.getElementById('connectionProgress');
-    
-    if (statusEl) {
-        statusEl.textContent = '✅ Pronto';
-        statusEl.className = 'text-sm font-medium text-green-700';
-    }
-    if (progressEl) {
-        progressEl.style.width = '100%';
-    }
-    
-    Debug.log('✅ Sistema inicializado', 'success');
-},
+            await this.checkConnection();
             
-            // Tentar auto-login
+            // Tentar auto-login (usando seu sistema Auth)
             this.tryAutoLogin();
             
             // Finalizar inicialização
@@ -69,6 +59,20 @@ checkConnectionSimple() {
         } catch (error) {
             this.handleInitializationError(error);
         }
+    },
+    
+    // Validar configuração
+    validateConfig() {
+        if (!window.CONFIG) {
+            throw new Error('CONFIG não encontrado');
+        }
+        
+        // Definir pageSize baseado na configuração
+        if (CONFIG.PAGINATION && CONFIG.PAGINATION.ITEMS_PER_PAGE) {
+            AppState.pageSize = CONFIG.PAGINATION.ITEMS_PER_PAGE;
+        }
+        
+        Debug.log('✅ CONFIG validado', 'success', CONFIG);
     },
     
     // Aguardar carregamento do DOM
@@ -87,9 +91,15 @@ checkConnectionSimple() {
         Debug.log('📦 Inicializando módulos...', 'info');
         
         // Inicializar UI Manager
-        if (typeof UI !== 'undefined') {
+        if (typeof UI !== 'undefined' && typeof UI.init === 'function') {
             UI.init();
             Debug.log('✅ UI Manager inicializado', 'success');
+        }
+        
+        // Inicializar FilterManager
+        if (typeof FilterManager !== 'undefined' && typeof FilterManager.init === 'function') {
+            FilterManager.init();
+            Debug.log('✅ FilterManager inicializado', 'success');
         }
         
         // Inicializar ícones Feather
@@ -106,10 +116,14 @@ checkConnectionSimple() {
     setupEventListeners() {
         Debug.log('🔗 Configurando event listeners globais...', 'info');
         
-        // Form de login
+        // Form de login (já tratado pelo seu Auth através do handleLogin global)
         const loginForm = document.getElementById('loginForm');
         if (loginForm) {
-            loginForm.addEventListener('submit', handleLogin);
+            // Verificar se já não tem listener
+            if (!loginForm.hasAttribute('data-listener-added')) {
+                loginForm.addEventListener('submit', window.handleLogin);
+                loginForm.setAttribute('data-listener-added', 'true');
+            }
         }
         
         // Teclas de atalho globais
@@ -157,12 +171,16 @@ checkConnectionSimple() {
     setupConnectionMonitoring() {
         // Online/Offline events
         window.addEventListener('online', () => {
-            UI.updateSystemStatus('Online', 'Conexão restaurada');
+            if (typeof UI !== 'undefined' && typeof UI.updateSystemStatus === 'function') {
+                UI.updateSystemStatus('Online', 'Conexão restaurada');
+            }
             Debug.log('🌐 Conexão restaurada', 'success');
         });
         
         window.addEventListener('offline', () => {
-            UI.updateSystemStatus('Offline', 'Sem conexão com a internet');
+            if (typeof UI !== 'undefined' && typeof UI.updateSystemStatus === 'function') {
+                UI.updateSystemStatus('Offline', 'Sem conexão com a internet');
+            }
             Debug.log('🚫 Conexão perdida', 'warning');
         });
     },
@@ -173,48 +191,92 @@ checkConnectionSimple() {
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                if (typeof Charts !== 'undefined') {
+                if (typeof Charts !== 'undefined' && typeof Charts.resize === 'function') {
                     Charts.resize();
                 }
             }, 250);
         });
     },
     
-    // Verificar conexão com N8N - Versão Simplificada
-async checkConnection() {
-    Debug.log('🔌 Verificando conexão com N8N...', 'info');
-    
-    const statusEl = document.getElementById('connectionStatus');
-    const progressEl = document.getElementById('connectionProgress');
-    
-    try {
-        if (statusEl) statusEl.textContent = 'Verificando...';
-        if (progressEl) progressEl.style.width = '50%';
+    // Verificar conexão com N8N
+    async checkConnection() {
+        Debug.log('🔌 Verificando conexão com N8N...', 'info');
         
-        // Simplesmente assumir que está conectado se chegou até aqui
-        setTimeout(() => {
-            if (statusEl) {
-                statusEl.textContent = '✅ Pronto';
-                statusEl.className = 'text-sm font-medium text-green-700';
+        const statusEl = document.getElementById('connectionStatus');
+        const progressEl = document.getElementById('connectionProgress');
+        
+        try {
+            if (statusEl) statusEl.textContent = 'Verificando...';
+            if (progressEl) progressEl.style.width = '25%';
+            
+            // Usar endpoint de teste ou frontend
+            const testUrl = CONFIG.ENDPOINTS.FRONTEND;
+            
+            // Testar conexão com timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            
+            if (progressEl) progressEl.style.width = '50%';
+            
+            const response = await fetch(testUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'test-connection',
+                    timestamp: new Date().toISOString()
+                }),
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            if (progressEl) progressEl.style.width = '75%';
+            
+            if (response.ok) {
+                if (statusEl) {
+                    statusEl.textContent = '✅ Conectado';
+                    statusEl.className = 'text-sm font-medium text-green-700';
+                }
+                if (progressEl) progressEl.style.width = '100%';
+                Debug.log('✅ Conexão com N8N estabelecida', 'success');
+                return true;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            if (progressEl) progressEl.style.width = '100%';
-            Debug.log('✅ Sistema pronto', 'success');
-        }, 500);
-        
-    } catch (error) {
-        if (statusEl) {
-            statusEl.textContent = '❌ Erro';
-            statusEl.className = 'text-sm font-medium text-red-700';
+            
+        } catch (error) {
+            if (statusEl) {
+                statusEl.textContent = '❌ Erro de Conexão';
+                statusEl.className = 'text-sm font-medium text-red-700';
+            }
+            if (progressEl) progressEl.style.width = '0%';
+            
+            if (error.name === 'AbortError') {
+                Debug.log('⏱️ Timeout na conexão com N8N', 'warning');
+            } else {
+                Debug.log(`❌ Erro na conexão com N8N: ${error.message}`, 'error');
+            }
+            
+            // Tentar modo offline/fallback
+            this.enableOfflineMode();
+            return false;
         }
-        if (progressEl) progressEl.style.width = '0%';
-        Debug.log(`❌ Erro: ${error.message}`, 'error');
-    }
-},
-
+    },
     
-    // Tentar auto-login
+    // Modo offline/fallback
+    enableOfflineMode() {
+        Debug.log('📴 Ativando modo offline', 'warning');
+        const statusEl = document.getElementById('connectionStatus');
+        if (statusEl) {
+            statusEl.textContent = '📴 Modo Offline';
+            statusEl.className = 'text-sm font-medium text-yellow-700';
+        }
+    },
+    
+    // Tentar auto-login usando seu sistema Auth
     tryAutoLogin() {
-        if (typeof Auth !== 'undefined') {
+        if (typeof Auth !== 'undefined' && typeof Auth.autoLogin === 'function') {
             const autoLoginSuccess = Auth.autoLogin();
             if (autoLoginSuccess) {
                 Debug.log('🔐 Auto-login realizado com sucesso', 'success');
@@ -226,10 +288,15 @@ async checkConnection() {
     
     // Completar inicialização
     completeInitialization() {
-        const duration = Performance.end('App Initialization');
+        let duration = 0;
+        if (typeof Performance !== 'undefined') {
+            duration = Performance.end('App Initialization');
+        }
         
         // Atualizar última atualização
-        UI.updateLastUpdate();
+        if (typeof UI !== 'undefined' && typeof UI.updateLastUpdate === 'function') {
+            UI.updateLastUpdate();
+        }
         
         // Log final
         Debug.log('🎉 MC Consultoria Sistema inicializado com sucesso!', 'success', {
@@ -249,7 +316,9 @@ async checkConnection() {
         });
         
         // Marcar performance
-        Performance.mark('app-ready');
+        if (typeof Performance !== 'undefined') {
+            Performance.mark('app-ready');
+        }
         
         // Remover loading se existir
         const loadingEl = document.getElementById('appLoading');
@@ -260,7 +329,10 @@ async checkConnection() {
     
     // Tratar erro de inicialização
     handleInitializationError(error) {
-        Performance.end('App Initialization');
+        if (typeof Performance !== 'undefined') {
+            Performance.end('App Initialization');
+        }
+        
         Debug.error('❌ Erro na inicialização da aplicação:', error.message);
         
         // Mostrar erro na interface
@@ -346,10 +418,16 @@ function sortTable(column) {
 
 // Exportar resultados
 async function exportResults(format = 'csv') {
+    // Verificar autenticação usando seu sistema
+    if (!Auth.isLoggedIn()) {
+        Debug.warning('Tentativa de exportação sem autenticação');
+        return;
+    }
+    
     Debug.log(`📤 Iniciando exportação em formato ${format}`, 'info');
     
     try {
-        const filters = FilterManager ? FilterManager.getActiveFilters() : {};
+        const filters = (typeof FilterManager !== 'undefined') ? FilterManager.getActiveFilters() : {};
         const exportUrl = `${CONFIG.ENDPOINTS.EXPORT}?format=${format}&sortBy=${AppState.currentSort.column}&sortOrder=${AppState.currentSort.order}&filters=${encodeURIComponent(JSON.stringify(filters))}`;
         
         window.open(exportUrl, '_blank');
@@ -357,8 +435,80 @@ async function exportResults(format = 'csv') {
         
     } catch (error) {
         Debug.error(`❌ Erro na exportação: ${error.message}`);
-        UI.showNotification(`Erro na exportação: ${error.message}`, 'error');
+        if (typeof UI !== 'undefined' && typeof UI.showError === 'function') {
+            UI.showError('exportError', `Erro na exportação: ${error.message}`);
+        }
     }
+}
+
+// Refresh dos resultados
+function refreshResults() {
+    // Verificar autenticação
+    Auth.requireAuth(() => {
+        Debug.log('🔄 Atualizando resultados...', 'info');
+        if (typeof pesquisarLicitacoes !== 'undefined') {
+            pesquisarLicitacoes(AppState.currentPage);
+        }
+    });
+}
+
+// Busca rápida na tabela
+function quickTableSearch(searchTerm) {
+    const tbody = document.getElementById('resultsTableBody');
+    if (!tbody) return;
+    
+    const rows = tbody.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const match = text.includes(searchTerm.toLowerCase());
+        row.style.display = match ? '' : 'none';
+    });
+}
+
+// Limpar filtros
+function clearFilters() {
+    Auth.requireAuth(() => {
+        if (typeof FilterManager !== 'undefined' && typeof FilterManager.clearAllFilters === 'function') {
+            FilterManager.clearAllFilters();
+            Debug.log('🧹 Filtros limpos', 'info');
+        }
+    });
+}
+
+// Funções de paginação
+function firstPage() {
+    Auth.requireAuth(() => {
+        if (typeof pesquisarLicitacoes !== 'undefined') {
+            pesquisarLicitacoes(1);
+        }
+    });
+}
+
+function previousPage() {
+    Auth.requireAuth(() => {
+        if (AppState.currentPage > 1 && typeof pesquisarLicitacoes !== 'undefined') {
+            pesquisarLicitacoes(AppState.currentPage - 1);
+        }
+    });
+}
+
+function nextPage() {
+    Auth.requireAuth(() => {
+        const maxPage = Math.ceil(AppState.totalItems / AppState.pageSize);
+        if (AppState.currentPage < maxPage && typeof pesquisarLicitacoes !== 'undefined') {
+            pesquisarLicitacoes(AppState.currentPage + 1);
+        }
+    });
+}
+
+function lastPage() {
+    Auth.requireAuth(() => {
+        const maxPage = Math.ceil(AppState.totalItems / AppState.pageSize);
+        if (typeof pesquisarLicitacoes !== 'undefined') {
+            pesquisarLicitacoes(maxPage);
+        }
+    });
 }
 
 // =====================================
@@ -367,7 +517,7 @@ async function exportResults(format = 'csv') {
 
 // Verificar se todos os scripts necessários foram carregados
 function checkDependencies() {
-    const requiredModules = ['CONFIG', 'Debug', 'Performance', 'UI', 'Auth'];
+    const requiredModules = ['CONFIG', 'Debug'];
     const missingModules = requiredModules.filter(module => typeof window[module] === 'undefined');
     
     if (missingModules.length > 0) {
@@ -381,6 +531,9 @@ function checkDependencies() {
 // Inicialização automática
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // Aguardar um pouco para garantir que todos os scripts carregaram
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         // Verificar dependências
         if (!checkDependencies()) {
             throw new Error('Módulos obrigatórios não foram carregados');
@@ -414,5 +567,12 @@ window.formatarMoedaBR = formatarMoedaBR;
 window.converterParaNumero = converterParaNumero;
 window.sortTable = sortTable;
 window.exportResults = exportResults;
+window.refreshResults = refreshResults;
+window.quickTableSearch = quickTableSearch;
+window.clearFilters = clearFilters;
+window.firstPage = firstPage;
+window.previousPage = previousPage;
+window.nextPage = nextPage;
+window.lastPage = lastPage;
 
 console.log('✅ MAIN: Arquivo principal carregado - Sistema pronto para inicialização');
