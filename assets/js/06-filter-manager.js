@@ -351,4 +351,14 @@ window.FilterManager = FilterManager;
 window.clearFilters = () => FilterManager.clearFilters();
 window.loadPreset = (preset) => FilterManager.loadPreset(preset);
 
+// Auto-inicialização quando DOM estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof FilterManager !== 'undefined' && typeof FilterManager.init === 'function') {
+        setTimeout(() => {
+            FilterManager.init();
+            console.log('✅ FILTER-MANAGER: Inicializado automaticamente');
+        }, 800);
+    }
+});
+
 console.log('✅ FILTER MANAGER: Sistema de filtros múltiplos carregado');
