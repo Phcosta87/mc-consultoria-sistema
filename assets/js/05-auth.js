@@ -84,8 +84,7 @@ const Auth = {
             const response = await fetch(CONFIG.ENDPOINTS.LOGIN, {
                 method: 'POST',
                 headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Content-Type': 'text/plain'
                 },
                 body: JSON.stringify({ username, password }),
                 signal: controller.signal
